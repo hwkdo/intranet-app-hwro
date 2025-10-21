@@ -206,15 +206,20 @@ $abbrechenBetriebsnr = function () {
                                             <flux:icon name="document" class="size-6 text-zinc-500 dark:text-zinc-400" />
                                             <div>
                                                 <flux:text class="font-medium">{{ $dokument->filename }}</flux:text>
-                                                @if($dokument->datum)
+                                                @if(isset($dokument->Belegdatum) && $dokument->Belegdatum)
                                                     <flux:text size="sm" class="text-zinc-500">
-                                                        Datum: {{ $dokument->datum }}
+                                                        Belegdatum: {{ $dokument->Belegdatum }}
+                                                    </flux:text>
+                                                @endif
+                                                @if(isset($dokument->Schlagwort) && $dokument->Schlagwort)
+                                                    <flux:text size="sm" class="text-zinc-500">
+                                                        Schlagwort: {{ $dokument->Schlagwort }}
                                                     </flux:text>
                                                 @endif
                                             </div>
                                         </div>
-                                        <flux:button 
-                                            size="sm" 
+                                        <flux:button
+                                            size="sm"
                                             variant="primary"
                                             icon="arrow-top-right-on-square"
                                             href="{{ $dokument->link }}"
