@@ -7,5 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Vorgang extends Model
 {
     protected $table = 'intranet_app_hwro_vorgangs';
-    protected $fillable = ['vorgangsnummer', 'betriebsnr'];   
+    
+    protected $fillable = ['vorgangsnummer', 'betriebsnr'];
+
+    protected function casts(): array
+    {
+        return [
+            'vorgangsnummer' => 'integer',
+            'betriebsnr' => 'integer',
+        ];
+    }
 }
