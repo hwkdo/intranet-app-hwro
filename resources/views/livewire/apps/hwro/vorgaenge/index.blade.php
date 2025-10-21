@@ -89,6 +89,7 @@ $setFilter = function (string $filter) {
                 <flux:table.columns>
                     <flux:table.column>Vorgangsnummer</flux:table.column>
                     <flux:table.column>Betriebsnr</flux:table.column>
+                    <flux:table.column>Erstellt</flux:table.column>
                     <flux:table.column>Aktionen</flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
@@ -102,6 +103,7 @@ $setFilter = function (string $filter) {
                                     <span class="text-zinc-400 dark:text-zinc-500">-</span>
                                 @endif
                             </flux:table.cell>
+                            <flux:table.cell>{{ $vorgang->created_at?->format('d.m.Y H:i') ?? '-' }}</flux:table.cell>
                             <flux:table.cell>
                                 <div class="flex gap-2">
                                     <flux:button 

@@ -1,27 +1,90 @@
 <?php
 
+use Flux\Flux;
+use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\D3RestLaravel\Client;
 use Hwkdo\D3RestLaravel\Enums\DocTypeEnum;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
-use function Livewire\Volt\{state, title, mount, computed};
 
-state(['vorgang']);
+use function Livewire\Volt\computed;
+use function Livewire\Volt\mount;
+use function Livewire\Volt\state;
+
+state([
+    'vorgang',
+    'gefundeneBetriebsnr' => null,
+    'showModal' => false,
+]);
 
 mount(function (Vorgang $vorgang) {
     $this->vorgang = $vorgang;
-    
-    $this->title = 'Vorgang ' . $vorgang->vorgangsnummer . ' - Handwerksrolle Online';
+
+    $this->title = 'Vorgang '.$vorgang->vorgangsnummer.' - Handwerksrolle Online';
 });
 
 $dokumente = computed(function () {
     $d3Client = app(Client::class);
-    
+
     return $d3Client->SearchResult(
         fulltext: $this->vorgang->vorgangsnummer,
         doc_type: DocTypeEnum::HandwerksrolleOnline,
         raw: false
     );
 });
+
+$betriebsakteDokumente = computed(function () {
+    if (! $this->vorgang->betriebsnr) {
+        return collect([]);
+    }
+
+    $d3Client = app(Client::class);
+
+    return $d3Client->SearchResult(
+        fulltext: $this->vorgang->betriebsnr,
+        doc_type: DocTypeEnum::Handwerksrolle,
+        raw: false
+    );
+});
+
+$betriebsdaten = computed(function () {
+    if (! $this->vorgang->betriebsnr) {
+        return null;
+    }
+
+    $bueService = app(BueLaravel::class);
+
+    return $bueService->getBetriebByBetriebsnr($this->vorgang->betriebsnr);
+});
+
+$pruefen = function () {
+    $bueService = app(BueLaravel::class);
+    $result = $bueService->getBetriebsnrByVorgangsnummer($this->vorgang->vorgangsnummer);
+
+    if ($result) {
+        $this->gefundeneBetriebsnr = $result;
+        $this->showModal = true;
+    } else {
+        $this->gefundeneBetriebsnr = null;
+        $this->showModal = false;
+        Flux::toast(text: 'Keine Betriebsnr gefunden', variant: 'warning');
+    }
+};
+
+$speichernBetriebsnr = function () {
+    if ($this->gefundeneBetriebsnr) {
+        $this->vorgang->update(['betriebsnr' => $this->gefundeneBetriebsnr]);
+        $this->vorgang->refresh();
+        $this->gefundeneBetriebsnr = null;
+        $this->showModal = false;
+
+        Flux::toast(text: 'Betriebsnummer erfolgreich gespeichert!', variant: 'success');
+    }
+};
+
+$abbrechenBetriebsnr = function () {
+    $this->gefundeneBetriebsnr = null;
+    $this->showModal = false;
+};
 
 ?>
 <section class="w-full">
@@ -62,13 +125,19 @@ $dokumente = computed(function () {
                     
                     <div>
                         <flux:label>Betriebsnummer</flux:label>
-                        <flux:text class="mt-1 text-lg font-semibold">
-                            @if($vorgang->betriebsnr)
-                                {{ $vorgang->betriebsnr }}
-                            @else
-                                <span class="text-zinc-400 dark:text-zinc-500">Nicht zugewiesen</span>
-                            @endif
-                        </flux:text>
+                        @if($vorgang->betriebsnr)
+                            <flux:text class="mt-1 text-lg font-semibold">{{ $vorgang->betriebsnr }}</flux:text>
+                        @else
+                            <div class="mt-1">
+                                <flux:button 
+                                    size="sm" 
+                                    variant="primary"
+                                    wire:click="pruefen"
+                                >
+                                    Prüfen
+                                </flux:button>
+                            </div>
+                        @endif
                     </div>
                     
                     <div>
@@ -119,7 +188,94 @@ $dokumente = computed(function () {
                     </div>
                 @endif
             </flux:card>
+
+            @if($vorgang->betriebsnr)
+                <div class="grid gap-6 md:grid-cols-2">
+                    <flux:card>
+                        <flux:heading size="lg" class="mb-4">D3 Dokumente Betriebsakte</flux:heading>
+                        
+                        @if($this->betriebsakteDokumente->isEmpty())
+                            <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                Keine Dokumente gefunden.
+                            </flux:text>
+                        @else
+                            <div class="space-y-3">
+                                @foreach($this->betriebsakteDokumente as $dokument)
+                                    <div class="flex items-center justify-between rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                                        <div class="flex items-center gap-3">
+                                            <flux:icon name="document" class="size-6 text-zinc-500 dark:text-zinc-400" />
+                                            <div>
+                                                <flux:text class="font-medium">{{ $dokument->filename }}</flux:text>
+                                                @if($dokument->datum)
+                                                    <flux:text size="sm" class="text-zinc-500">
+                                                        Datum: {{ $dokument->datum }}
+                                                    </flux:text>
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <flux:button 
+                                            size="sm" 
+                                            variant="primary"
+                                            icon="arrow-top-right-on-square"
+                                            href="{{ $dokument->link }}"
+                                            target="_blank"
+                                        >
+                                            Öffnen
+                                        </flux:button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </flux:card>
+
+                    <flux:card>
+                        <flux:heading size="lg" class="mb-4">BuE Betriebsdaten</flux:heading>
+                        
+                        @if($this->betriebsdaten)
+                            <div class="space-y-4">
+                                <div>
+                                    <flux:label>Name</flux:label>
+                                    <flux:text class="mt-1 text-lg font-semibold">{{ $this->betriebsdaten->name ?? '-' }}</flux:text>
+                                </div>
+                                
+                                <div>
+                                    <flux:label>Eintragungsdatum</flux:label>
+                                    <flux:text class="mt-1">{{ $this->betriebsdaten->edat ?? '-' }}</flux:text>
+                                </div>
+                                
+                                <div>
+                                    <flux:label>Betriebsart</flux:label>
+                                    <flux:text class="mt-1">{{ $this->betriebsdaten->betriebsart ?? '-' }}</flux:text>
+                                </div>
+                            </div>
+                        @else
+                            <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                Keine Betriebsdaten gefunden.
+                            </flux:text>
+                        @endif
+                    </flux:card>
+                </div>
+            @endif
         </div>
     </x-intranet-app-hwro::hwro-layout>
+
+    {{-- Modal für Betriebsnummer-Bestätigung --}}
+    <flux:modal wire:model="showModal" name="betriebsnr-confirm">
+        <flux:heading size="lg" class="mb-4">Betriebsnummer gefunden</flux:heading>
+        
+        <flux:text class="mb-6">
+            Es wurde die Betriebsnummer <strong>{{ $gefundeneBetriebsnr }}</strong> gefunden. 
+            Möchten Sie diese dem Vorgang zuweisen?
+        </flux:text>
+        
+        <div class="flex justify-end gap-2">
+            <flux:button variant="ghost" wire:click="abbrechenBetriebsnr">
+                Nein
+            </flux:button>
+            <flux:button variant="primary" wire:click="speichernBetriebsnr">
+                Ja, speichern
+            </flux:button>
+        </div>
+    </flux:modal>
 </section>
 
