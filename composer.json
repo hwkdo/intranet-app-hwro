@@ -25,7 +25,7 @@
         "spatie/laravel-permission": "^6.16",
         "livewire/volt": "^1.6.7",
         "hwkdo/bue-laravel": "dev-main || ^0.1",
-        "hwkdo/d3-rest-laravel": "dev-main || ^0.1"
+        "hwkdo/d3-rest-laravel": "dev-main || ^1"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
