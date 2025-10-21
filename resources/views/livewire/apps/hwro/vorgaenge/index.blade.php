@@ -1,5 +1,7 @@
 <?php
 
+use Flux\Flux;
+use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use function Livewire\Volt\{state, title, computed};
 
@@ -8,6 +10,8 @@ title('Vorgänge - Handwerksrolle Online');
 state([
     'filter' => 'alle',
     'search' => '',
+    'gefundeneZuordnungen' => [],
+    'showResultModal' => false,
 ]);
 
 $vorgaenge = computed(function () {
@@ -24,6 +28,62 @@ $vorgaenge = computed(function () {
 
 $setFilter = function (string $filter) {
     $this->filter = $filter;
+};
+
+$alleBetriebenrPruefen = function () {
+    $this->gefundeneZuordnungen = [];
+    $bueService = app(BueLaravel::class);
+    
+    // Hole alle aktuell angezeigten Vorgänge ohne Betriebsnummer
+    $vorgaengeOhneBetriebsnr = Vorgang::query()
+        ->when($this->filter === 'mit_betrieb', fn($query) => $query->whereNotNull('betriebsnr'))
+        ->when($this->filter === 'ohne_betrieb', fn($query) => $query->whereNull('betriebsnr'))
+        ->when($this->search, fn($query) => $query->where(function ($q) {
+            $q->where('vorgangsnummer', 'like', "%{$this->search}%")
+              ->orWhere('betriebsnr', 'like', "%{$this->search}%");
+        }))
+        ->whereNull('betriebsnr')
+        ->get();
+    
+    foreach ($vorgaengeOhneBetriebsnr as $vorgang) {
+        $betriebsnr = $bueService->getBetriebsnrByVorgangsnummer($vorgang->vorgangsnummer);
+        
+        if ($betriebsnr) {
+            $this->gefundeneZuordnungen[] = [
+                'vorgang_id' => $vorgang->id,
+                'vorgangsnummer' => $vorgang->vorgangsnummer,
+                'betriebsnr' => $betriebsnr,
+            ];
+        }
+    }
+    
+    $this->showResultModal = true;
+    
+    if (empty($this->gefundeneZuordnungen)) {
+        Flux::toast(text: 'Keine neuen Betriebsnummern gefunden', variant: 'info');
+    }
+};
+
+$speichernZuordnungen = function () {
+    $anzahl = 0;
+    
+    foreach ($this->gefundeneZuordnungen as $zuordnung) {
+        $vorgang = Vorgang::find($zuordnung['vorgang_id']);
+        if ($vorgang) {
+            $vorgang->update(['betriebsnr' => $zuordnung['betriebsnr']]);
+            $anzahl++;
+        }
+    }
+    
+    $this->gefundeneZuordnungen = [];
+    $this->showResultModal = false;
+    
+    Flux::toast(text: "{$anzahl} Betriebsnummer(n) erfolgreich gespeichert!", variant: 'success');
+};
+
+$abbrechenZuordnungen = function () {
+    $this->gefundeneZuordnungen = [];
+    $this->showResultModal = false;
 };
 
 ?>
@@ -51,14 +111,24 @@ $setFilter = function (string $filter) {
                     class="w-full max-w-md"
                 />
                 
-                <flux:button 
-                    :href="route('apps.hwro.vorgaenge.create')" 
-                    wire:navigate 
-                    variant="primary" 
-                    icon="plus"
-                >
-                    Neuer Vorgang
-                </flux:button>
+                <div class="flex gap-2">
+                    <flux:button 
+                        wire:click="alleBetriebenrPruefen" 
+                        
+                        icon="magnifying-glass"
+                    >
+                        Alle Betriebsnr prüfen
+                    </flux:button>
+                    
+                    <flux:button 
+                        :href="route('apps.hwro.vorgaenge.create')" 
+                        wire:navigate 
+                        variant="primary" 
+                        icon="plus"
+                    >
+                        Neuer Vorgang
+                    </flux:button>
+                </div>
             </div>
 
             <div class="flex items-center gap-2">
@@ -131,5 +201,52 @@ $setFilter = function (string $filter) {
             </flux:table>
         </div>
     </x-intranet-app-hwro::hwro-layout>
+
+    {{-- Modal für gefundene Betriebsnummern --}}
+    <flux:modal wire:model="showResultModal" name="betriebsnr-results">
+        <flux:heading size="lg" class="mb-4">Gefundene Betriebsnummern</flux:heading>
+        
+        @if(count($gefundeneZuordnungen) > 0)
+            <flux:text class="mb-4">
+                Es wurden <strong>{{ count($gefundeneZuordnungen) }}</strong> Betriebsnummer(n) gefunden:
+            </flux:text>
+            
+            <div class="mb-6 max-h-96 overflow-y-auto">
+                <flux:table>
+                    <flux:table.columns>
+                        <flux:table.column>Vorgangsnummer</flux:table.column>
+                        <flux:table.column>Gefundene Betriebsnr</flux:table.column>
+                    </flux:table.columns>
+                    <flux:table.rows>
+                        @foreach($gefundeneZuordnungen as $zuordnung)
+                            <flux:table.row>
+                                <flux:table.cell>{{ $zuordnung['vorgangsnummer'] }}</flux:table.cell>
+                                <flux:table.cell>{{ $zuordnung['betriebsnr'] }}</flux:table.cell>
+                            </flux:table.row>
+                        @endforeach
+                    </flux:table.rows>
+                </flux:table>
+            </div>
+            
+            <div class="flex justify-end gap-2">
+                <flux:button variant="ghost" wire:click="abbrechenZuordnungen">
+                    Abbrechen
+                </flux:button>
+                <flux:button variant="primary" wire:click="speichernZuordnungen">
+                    Alle speichern
+                </flux:button>
+            </div>
+        @else
+            <flux:text class="mb-6">
+                Es wurden keine neuen Betriebsnummern gefunden.
+            </flux:text>
+            
+            <div class="flex justify-end">
+                <flux:button variant="ghost" wire:click="abbrechenZuordnungen">
+                    Schließen
+                </flux:button>
+            </div>
+        @endif
+    </flux:modal>
 </section>
 
