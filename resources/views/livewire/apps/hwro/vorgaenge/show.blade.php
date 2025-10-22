@@ -86,6 +86,30 @@ $abbrechenBetriebsnr = function () {
     $this->showModal = false;
 };
 
+$uebertragenAusOnlineEintragung = function () {
+    $result = $this->vorgang->makeD3Betriebsakte();
+    
+    if ($result && $result['success']) {
+        // Invalidiere das computed property, damit es beim nächsten Zugriff neu geladen wird
+        unset($this->betriebsakteDokumente);
+        
+        Flux::toast(
+            text: 'Dokumente erfolgreich in die Betriebsakte übertragen!',
+            variant: 'success'
+        );
+    } elseif ($result) {
+        Flux::toast(
+            text: 'Fehler beim Übertragen: ' . ($result['message'] ?? 'Unbekannter Fehler'),
+            variant: 'danger'
+        );
+    } else {
+        Flux::toast(
+            text: 'Keine Dokumente zum Übertragen gefunden.',
+            variant: 'warning'
+        );
+    }
+};
+
 ?>
 <section class="w-full">
     <div class="relative mb-6 w-full">
@@ -195,9 +219,21 @@ $abbrechenBetriebsnr = function () {
                         <flux:heading size="lg" class="mb-4">D3 Dokumente Betriebsakte</flux:heading>
                         
                         @if($this->betriebsakteDokumente->isEmpty())
-                            <flux:text class="text-zinc-500 dark:text-zinc-400">
-                                Keine Dokumente gefunden.
-                            </flux:text>
+                            <div class="space-y-4">
+                                <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                    Keine Dokumente gefunden.
+                                </flux:text>
+                                
+                                @if(!$this->dokumente->isEmpty())
+                                    <flux:button 
+                                        variant="primary"
+                                        icon="arrow-path"
+                                        wire:click="uebertragenAusOnlineEintragung"
+                                    >
+                                        Übertragen aus Online Eintragung
+                                    </flux:button>
+                                @endif
+                            </div>
                         @else
                             <div class="space-y-3">
                                 @foreach($this->betriebsakteDokumente as $dokument)
