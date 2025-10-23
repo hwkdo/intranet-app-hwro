@@ -16,7 +16,7 @@ class IntranetAppHwroSettings extends Model
         ];
     }
 
-    public static function current(): IntranetAppHwroSettings
+    public static function current(): IntranetAppHwroSettings|null
     {
         return self::orderBy('version', 'desc')->first();
     }
