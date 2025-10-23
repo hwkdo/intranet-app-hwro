@@ -2,12 +2,11 @@
 
 namespace Hwkdo\IntranetAppHwro\Services;
 
-use Hwkdo\D3RestLaravel\DTO\NewObjectDTO;
-use Hwkdo\D3RestLaravel\models\Handwerksrolle;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\D3RestLaravel\Client;
+use Hwkdo\D3RestLaravel\DTO\NewObjectDTO;
 use Hwkdo\D3RestLaravel\Enums\DocTypeEnum;
-
+use Hwkdo\D3RestLaravel\models\Handwerksrolle;
 
 class d3Service
 {

@@ -3,7 +3,8 @@
 use Flux\Flux;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
-use function Livewire\Volt\{state, title, computed};
+use Illuminate\Support\Facades\Auth;
+use function Livewire\Volt\{state, title, computed, mount};
 
 title('Vorgänge - Handwerksrolle Online');
 
@@ -13,6 +14,16 @@ state([
     'gefundeneZuordnungen' => [],
     'showResultModal' => false,
 ]);
+
+mount(function () {
+    // Lade den Default-Filter aus den User-Settings
+    $user = Auth::user();
+    $hwroSettings = $user->settings->app->hwro;
+    
+    if ($hwroSettings && isset($hwroSettings->defaultVorgaengeFilter)) {
+        $this->filter = $hwroSettings->defaultVorgaengeFilter->value;
+    }
+});
 
 $vorgaenge = computed(function () {
     return Vorgang::query()
@@ -101,6 +112,10 @@ $abbrechenZuordnungen = function () {
         <x-slot:navigation>
             <flux:navlist.item :href="route('apps.hwro.index')" wire:navigate>Übersicht</flux:navlist.item>
             <flux:navlist.item :href="route('apps.hwro.vorgaenge.index')" wire:navigate current>Vorgänge</flux:navlist.item>
+            <flux:navlist.item :href="route('apps.hwro.settings.user')" wire:navigate>Meine Einstellungen</flux:navlist.item>
+            @can('manage-app-hwro')
+                <flux:navlist.item :href="route('apps.hwro.admin.index')" wire:navigate>Admin</flux:navlist.item>
+            @endcan
         </x-slot:navigation>
 
         <div class="space-y-6">

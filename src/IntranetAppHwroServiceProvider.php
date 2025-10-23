@@ -3,9 +3,9 @@
 namespace Hwkdo\IntranetAppHwro;
 
 use Hwkdo\IntranetAppHwro\Commands\SearchBetriebsnr;
+use Livewire\Volt\Volt;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Livewire\Volt\Volt;
 
 class IntranetAppHwroServiceProvider extends PackageServiceProvider
 {
@@ -28,8 +28,8 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
     {
         parent::boot();
 
-        $this->app->booted( function() {
-            Volt::mount(__DIR__.'/../resources/views/livewire');                        
+        $this->app->booted(function () {
+            Volt::mount(__DIR__.'/../resources/views/livewire');
         });
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');

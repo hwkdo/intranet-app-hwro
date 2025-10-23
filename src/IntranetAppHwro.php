@@ -1,10 +1,13 @@
 <?php
 
 namespace Hwkdo\IntranetAppHwro;
+
 use Hwkdo\IntranetAppBase\Interfaces\IntranetAppInterface;
+use Hwkdo\IntranetAppHwro\Data\AppSettings;
+use Hwkdo\IntranetAppHwro\Data\UserSettings;
 use Illuminate\Support\Collection;
 
-class IntranetAppHwro implements IntranetAppInterface 
+class IntranetAppHwro implements IntranetAppInterface
 {
     public static function app_name(): string
     {
@@ -29,5 +32,15 @@ class IntranetAppHwro implements IntranetAppInterface
     public static function roles_user(): Collection
     {
         return collect(config('intranet-app-hwro.roles.user'));
-    }    
+    }
+
+    public static function userSettingsClass(): ?string
+    {
+        return UserSettings::class;
+    }
+
+    public static function appSettingsClass(): ?string
+    {
+        return AppSettings::class;
+    }
 }
