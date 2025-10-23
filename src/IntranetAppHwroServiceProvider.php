@@ -3,6 +3,7 @@
 namespace Hwkdo\IntranetAppHwro;
 
 use Hwkdo\IntranetAppHwro\Commands\SearchBetriebsnr;
+use Hwkdo\IntranetAppHwro\Commands\MakeBetriebsakte;
 use Livewire\Volt\Volt;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -21,7 +22,8 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->discoversMigrations()
-            ->hasCommand(SearchBetriebsnr::class);
+            ->hasCommand(SearchBetriebsnr::class)
+            ->hasCommand(MakeBetriebsakte::class);
     }
 
     public function boot(): void

@@ -165,7 +165,7 @@ $clearSchedulerEvents = function () {
 };
 
 $runSearchBetriebsnr = function () {
-    \Artisan::call('hwro:search-betriebsnr');
+    \Artisan::call('intranet-app-hwro:search-betriebsnr');
     
     Flux::toast(
         heading: 'Command gestartet',
