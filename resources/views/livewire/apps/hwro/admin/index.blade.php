@@ -164,6 +164,26 @@ $clearSchedulerEvents = function () {
     $this->schedulerEvents = [];
 };
 
+$runSearchBetriebsnr = function () {
+    \Artisan::call('hwro:search-betriebsnr');
+    
+    Flux::toast(
+        heading: 'Command gestartet',
+        text: 'Der Betriebsnummern-Suchvorgang wurde gestartet.',
+        variant: 'success'
+    );
+};
+
+$runMakeBetriebsakte = function () {
+    \Artisan::call('intranet-app-hwro:make-betriebsakte');
+    
+    Flux::toast(
+        heading: 'Command gestartet',
+        text: 'Die Betriebsakten-Erstellung wurde gestartet.',
+        variant: 'success'
+    );
+};
+
 ?>
 
 <!-- Cache-Bust: {{ now()->timestamp }} -->
@@ -276,20 +296,40 @@ $clearSchedulerEvents = function () {
                 <flux:card>
                     <div class="mb-4 flex items-center justify-between">
                         <flux:heading size="lg">Scheduler Events</flux:heading>
-                        @if(count($schedulerEvents) > 0)
-                            <flux:button 
-                                wire:click="clearSchedulerEvents"
-                                variant="ghost"
-                                size="sm"
-                            >
-                                Liste leeren
-                            </flux:button>
-                        @endif
+                        <div class="flex gap-2">
+                            @if(count($schedulerEvents) > 0)
+                                <flux:button 
+                                    wire:click="clearSchedulerEvents"
+                                    variant="ghost"
+                                    size="sm"
+                                >
+                                    Liste leeren
+                                </flux:button>
+                            @endif
+                        </div>
                     </div>
                     
-                    <flux:text class="mb-6 text-zinc-500 dark:text-zinc-400">
+                    <flux:text class="mb-4 text-zinc-500 dark:text-zinc-400">
                         Live-Übersicht der Betriebsnummern-Suchvorgänge.
                     </flux:text>
+
+                    <div class="mb-6 flex gap-2">
+                        <flux:button 
+                            wire:click="runSearchBetriebsnr"
+                            icon="magnifying-glass"
+                            size="sm"
+                        >
+                            Betriebsnummern suchen
+                        </flux:button>
+                        <flux:button 
+                            wire:click="runMakeBetriebsakte"
+                            icon="document-plus"
+                            size="sm"
+                            variant="outline"
+                        >
+                            Betriebsakten erstellen
+                        </flux:button>
+                    </div>
 
                     <flux:separator variant="subtle" class="mb-4" />
 
@@ -327,20 +367,3 @@ $clearSchedulerEvents = function () {
         </div>
     </x-intranet-app-hwro::hwro-layout>
 </section>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Echo verfügbar:', typeof window.Echo !== 'undefined');
-    console.log('Livewire verfügbar:', typeof Livewire !== 'undefined');
-    
-    if (typeof window.Echo !== 'undefined') {
-        console.log('Echo Konfiguration:', window.Echo);
-        
-        // Test-Listener direkt
-        window.Echo.channel('intranet-app-hwro-betriebsnr-search')
-            .listen('.betriebsnr.search.started', (e) => {
-                console.log('Event empfangen (direkt):', e);
-            });
-    }
-});
-</script>
