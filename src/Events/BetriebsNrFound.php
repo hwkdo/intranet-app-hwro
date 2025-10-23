@@ -30,7 +30,7 @@ class BetriebsNrFound implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('intranet-app-hwro-betriebsnr-search'),
+            new Channel('intranet-app-hwro-scheduler'),
         ];
     }
 

@@ -16,7 +16,7 @@ state([
 ]);
 
 on([
-    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.search.started' => function ($event) {
+    'echo:intranet-app-hwro-scheduler,.betriebsnr.search.started' => function ($event) {
         array_unshift($this->schedulerEvents, [
             'id' => uniqid() . '-' . mt_rand(),
             'type' => 'Suche gestartet',
@@ -26,7 +26,7 @@ on([
         ]);
         $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
     },
-    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.found' => function ($event) {
+    'echo:intranet-app-hwro-scheduler,.betriebsnr.found' => function ($event) {
         array_unshift($this->schedulerEvents, [
             'id' => uniqid() . '-' . mt_rand(),
             'type' => 'Betriebsnummer gefunden',
@@ -36,7 +36,7 @@ on([
         ]);
         $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
     },
-    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.not.found' => function ($event) {
+    'echo:intranet-app-hwro-scheduler,.betriebsnr.not.found' => function ($event) {
         array_unshift($this->schedulerEvents, [
             'id' => uniqid() . '-' . mt_rand(),
             'type' => 'Betriebsnummer nicht gefunden',
@@ -46,12 +46,32 @@ on([
         ]);
         $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
     },
-    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.search.finished' => function ($event) {
+    'echo:intranet-app-hwro-scheduler,.betriebsnr.search.finished' => function ($event) {
         array_unshift($this->schedulerEvents, [
             'id' => uniqid() . '-' . mt_rand(),
             'type' => 'Suche abgeschlossen',
             'message' => $event['msg'] ?? '',
             'variant' => 'neutral',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
+    'echo:intranet-app-hwro-scheduler,.betriebsakte.make.started' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid() . '-' . mt_rand(),
+            'type' => 'Betriebsakte erstellung gestartet',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'info',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
+    'echo:intranet-app-hwro-scheduler,.betriebsakte.make.finished' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid() . '-' . mt_rand(),
+            'type' => 'Betriebsakte erstellung abgeschlossen',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'success',
             'timestamp' => now()->format('d.m.Y H:i:s'),
         ]);
         $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);

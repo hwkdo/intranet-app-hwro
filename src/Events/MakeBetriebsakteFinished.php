@@ -8,7 +8,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class SearchBetriebsNrStarted implements ShouldBroadcast
+class MakeBetriebsakteFinished implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -36,6 +36,6 @@ class SearchBetriebsNrStarted implements ShouldBroadcast
 
     public function broadcastAs(): string
     {
-        return 'betriebsnr.search.started';
+        return 'betriebsakte.make.finished';
     }
 }

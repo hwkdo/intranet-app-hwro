@@ -2,6 +2,8 @@
 
 namespace Hwkdo\IntranetAppHwro\Commands;
 
+use Hwkdo\IntranetAppHwro\Events\MakeBetriebsakteStarted;
+use Hwkdo\IntranetAppHwro\Events\MakeBetriebsakteFinished;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -27,7 +29,8 @@ class MakeBetriebsakte extends Command
     public function handle()
     {
         Log::info('intranet-app-hwro:make-betriebsakte started');
-        
+        MakeBetriebsakteStarted::dispatch('intranet-app-hwro:make-betriebsakte started');
         Log::info('intranet-app-hwro:make-betriebsakte finished');
+        MakeBetriebsakteFinished::dispatch('intranet-app-hwro:make-betriebsakte finished');
     }
 }
