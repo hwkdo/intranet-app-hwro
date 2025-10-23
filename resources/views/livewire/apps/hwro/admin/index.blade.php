@@ -4,13 +4,58 @@ use Hwkdo\IntranetAppHwro\Data\AppSettings;
 use Hwkdo\IntranetAppHwro\Models\IntranetAppHwroSettings;
 use Flux\Flux;
 
-use function Livewire\Volt\{computed, mount, state, title};
+use function Livewire\Volt\{computed, mount, state, title, on};
 
 title('Admin - Handwerksrolle Online');
 
 state([
     'appSettings' => [],
     'settingsId' => null,
+    'schedulerEvents' => [],
+    'activeTab' => 'einstellungen',
+]);
+
+on([
+    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.search.started' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid() . '-' . mt_rand(),
+            'type' => 'Suche gestartet',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'info',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
+    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.found' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid() . '-' . mt_rand(),
+            'type' => 'Betriebsnummer gefunden',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'success',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
+    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.not.found' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid() . '-' . mt_rand(),
+            'type' => 'Betriebsnummer nicht gefunden',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'warning',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
+    'echo:intranet-app-hwro-betriebsnr-search,.betriebsnr.search.finished' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid() . '-' . mt_rand(),
+            'type' => 'Suche abgeschlossen',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'neutral',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
 ]);
 
 mount(function () {
@@ -115,8 +160,13 @@ $save = function () {
     }
 };
 
+$clearSchedulerEvents = function () {
+    $this->schedulerEvents = [];
+};
+
 ?>
 
+<!-- Cache-Bust: {{ now()->timestamp }} -->
 <section class="w-full">
     <div class="relative mb-6 w-full">
         <flux:heading size="xl" level="1">Handwerksrolle Online</flux:heading>
@@ -134,28 +184,27 @@ $save = function () {
             @endcan
         </x-slot:navigation>
 
-        {{-- Custom Tabs mit Alpine.js (clientseitig) --}}
-        <div x-data="{ activeTab: 'einstellungen' }">
+        {{-- Tabs mit Livewire --}}
+        <div>
             <div class="mb-6 border-b border-zinc-200 dark:border-zinc-700">
                 <div class="flex gap-4">
                     <button 
-                        @click="activeTab = 'einstellungen'"
-                        :class="activeTab === 'einstellungen' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'"
-                        class="px-4 py-2 -mb-px border-b-2 transition-colors"
+                        wire:click="$set('activeTab', 'einstellungen')"
+                        class="px-4 py-2 -mb-px border-b-2 transition-colors {{ $activeTab === 'einstellungen' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}"
                     >
                         Einstellungen
                     </button>
                     <button 
-                        @click="activeTab = 'scheduler'"
-                        :class="activeTab === 'scheduler' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'"
-                        class="px-4 py-2 -mb-px border-b-2 transition-colors"
+                        wire:click="$set('activeTab', 'scheduler')"
+                        class="px-4 py-2 -mb-px border-b-2 transition-colors {{ $activeTab === 'scheduler' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}"
                     >
                         Scheduler
                     </button>
                 </div>
             </div>
 
-            <div x-show="activeTab === 'einstellungen'" x-cloak style="min-height: 400px;">
+            @if($activeTab === 'einstellungen')
+            <div style="min-height: 400px;">
             <flux:card>
                 <flux:heading size="lg" class="mb-4">Administrator-Einstellungen</flux:heading>
                 <flux:text class="mb-6">
@@ -220,16 +269,78 @@ $save = function () {
                 </div>
             </flux:card>
             </div>
+            @endif
 
-            <div x-show="activeTab === 'scheduler'" x-cloak style="min-height: 400px;">
+            @if($activeTab === 'scheduler')
+            <div style="min-height: 400px;">
                 <flux:card>
-                    <flux:heading size="lg" class="mb-4">Scheduler</flux:heading>
-                    <flux:text class="text-zinc-500 dark:text-zinc-400">
-                        Dieser Bereich wird zu einem späteren Zeitpunkt erweitert.
+                    <div class="mb-4 flex items-center justify-between">
+                        <flux:heading size="lg">Scheduler Events</flux:heading>
+                        @if(count($schedulerEvents) > 0)
+                            <flux:button 
+                                wire:click="clearSchedulerEvents"
+                                variant="ghost"
+                                size="sm"
+                            >
+                                Liste leeren
+                            </flux:button>
+                        @endif
+                    </div>
+                    
+                    <flux:text class="mb-6 text-zinc-500 dark:text-zinc-400">
+                        Live-Übersicht der Betriebsnummern-Suchvorgänge.
                     </flux:text>
+
+                    <flux:separator variant="subtle" class="mb-4" />
+
+                    <div class="space-y-2" wire:poll.visible>
+                        @if(count($schedulerEvents) === 0)
+                            <div class="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                                <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                    Keine Events empfangen. Warten auf Scheduler-Aktivität...
+                                </flux:text>
+                            </div>
+                        @else
+                            @foreach($schedulerEvents as $event)
+                                <div 
+                                    class="rounded-lg border p-4 @if($event['variant'] === 'info') border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30 @elseif($event['variant'] === 'success') border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 @elseif($event['variant'] === 'warning') border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30 @else border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50 @endif"
+                                    wire:key="event-{{ $event['id'] }}"
+                                >
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium @if($event['variant'] === 'info') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @elseif($event['variant'] === 'success') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 @elseif($event['variant'] === 'warning') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @else bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 @endif">
+                                                    {{ $event['type'] }}
+                                                </span>
+                                                <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $event['timestamp'] }}</span>
+                                            </div>
+                                            <p class="text-sm text-zinc-900 dark:text-zinc-100 break-words">{{ $event['message'] }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
                 </flux:card>
             </div>
+            @endif
         </div>
     </x-intranet-app-hwro::hwro-layout>
 </section>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Echo verfügbar:', typeof window.Echo !== 'undefined');
+    console.log('Livewire verfügbar:', typeof Livewire !== 'undefined');
+    
+    if (typeof window.Echo !== 'undefined') {
+        console.log('Echo Konfiguration:', window.Echo);
+        
+        // Test-Listener direkt
+        window.Echo.channel('intranet-app-hwro-betriebsnr-search')
+            .listen('.betriebsnr.search.started', (e) => {
+                console.log('Event empfangen (direkt):', e);
+            });
+    }
+});
+</script>

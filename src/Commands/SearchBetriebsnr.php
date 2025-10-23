@@ -5,6 +5,8 @@ namespace Hwkdo\IntranetAppHwro\Commands;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\IntranetAppHwro\Events\BetriebsNrFound;
 use Hwkdo\IntranetAppHwro\Events\BetriebsNrNotFound;
+use Hwkdo\IntranetAppHwro\Events\SearchBetriebsNrFinished;
+use Hwkdo\IntranetAppHwro\Events\SearchBetriebsNrStarted;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -31,6 +33,7 @@ class SearchBetriebsnr extends Command
     public function handle(BueLaravel $bueService)
     {
         Log::info('intranet-app-hwro:search-betriebsnr started');
+        SearchBetriebsNrStarted::dispatch('intranet-app-hwro:search-betriebsnr started');
         $vorgaenge = Vorgang::whereNull('betriebsnr')->get();
         $found = [];
         $notFound = [];
@@ -49,5 +52,6 @@ class SearchBetriebsnr extends Command
         $this->info('Found: '.implode(',', $found));
         $this->info('Not found: '.implode(',', $notFound));
         Log::info('intranet-app-hwro:search-betriebsnr finished');
+        SearchBetriebsNrFinished::dispatch('intranet-app-hwro:search-betriebsnr finished');
     }
 }
