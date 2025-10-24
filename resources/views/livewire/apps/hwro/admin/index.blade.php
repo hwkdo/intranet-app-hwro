@@ -120,11 +120,11 @@ $runMakeBetriebsakte = function () {
             
         <flux:tab.panel name="einstellungen">
             <div style="min-height: 400px;">
-                <x-intranet-app-base::admin-settings 
-                    app-identifier="hwro"
-                    settings-model-class="\Hwkdo\IntranetAppHwro\Models\IntranetAppHwroSettings"
-                    app-settings-class="\Hwkdo\IntranetAppHwro\Data\AppSettings"
-                />
+                @livewire('intranet-app-base::admin-settings', [
+                    'appIdentifier' => 'hwro',
+                    'settingsModelClass' => '\Hwkdo\IntranetAppHwro\Models\IntranetAppHwroSettings',
+                    'appSettingsClass' => '\Hwkdo\IntranetAppHwro\Data\AppSettings'
+                ])
             </div>
         </flux:tab.panel>
 

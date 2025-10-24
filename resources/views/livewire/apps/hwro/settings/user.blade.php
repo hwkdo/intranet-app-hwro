@@ -7,6 +7,6 @@ title('Meine Einstellungen - Handwerksrolle Online');
 ?>
 
 <x-intranet-app-hwro::hwro-layout heading="Handwerksrolle Online" subheading="Meine Einstellungen">
-    <x-intranet-app-base::user-settings app-identifier="hwro" />
+    @livewire('intranet-app-base::user-settings', ['appIdentifier' => 'hwro'])
 </x-intranet-app-hwro::hwro-layout>
 
