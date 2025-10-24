@@ -15,13 +15,14 @@
     $navItems = !empty($navItems) ? $navItems : $defaultNavItems;
 @endphp
 
-<x-intranet-app-base::app-layout 
-    app-identifier="hwro"
-    :heading="$heading"
-    :subheading="$subheading"
-    :nav-items="$navItems"
->
-    @if(request()->routeIs('apps.hwro.index'))
+@if(request()->routeIs('apps.hwro.index'))
+    <x-intranet-app-base::app-layout 
+        app-identifier="hwro"
+        :heading="$heading"
+        :subheading="$subheading"
+        :nav-items="$navItems"
+        :wrap-in-card="false"
+    >
         <x-intranet-app-base::app-index-auto 
             app-identifier="hwro"
             app-name="Handwerksrolle Online"
@@ -30,8 +31,16 @@
             welcome-title="Willkommen in der Handwerksrolle"
             welcome-description="Hier können Sie alle Aspekte der Handwerksrolle verwalten."
         />
-    @else
+    </x-intranet-app-base::app-layout>
+@else
+    <x-intranet-app-base::app-layout 
+        app-identifier="hwro"
+        :heading="$heading"
+        :subheading="$subheading"
+        :nav-items="$navItems"
+        :wrap-in-card="true"
+    >
         {{ $slot }}
-    @endif
-</x-intranet-app-base::app-layout>
+    </x-intranet-app-base::app-layout>
+@endif
 

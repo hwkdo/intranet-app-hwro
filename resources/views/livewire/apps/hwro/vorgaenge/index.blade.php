@@ -109,16 +109,8 @@ $abbrechenZuordnungen = function () {
 };
 
 ?>
-<section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">Handwerksrolle Online</flux:heading>
-        <flux:subheading size="lg" class="mb-6">Verwaltung der Handwerksrolle</flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-    
-    <x-intranet-app-hwro::hwro-layout>
-        <x-slot:heading>Vorgänge</x-slot:heading>
-        <x-slot:subheading>Verwalten Sie hier alle Vorgänge der Handwerksrolle</x-slot:subheading>
+
+<x-intranet-app-hwro::hwro-layout heading="Vorgänge" subheading="Verwalten Sie hier alle Vorgänge der Handwerksrolle">
 
         <div class="space-y-6">
             <div class="flex items-center justify-between gap-4">
@@ -238,10 +230,9 @@ $abbrechenZuordnungen = function () {
                 </flux:table.rows>
             </flux:table>
         </div>
-    </x-intranet-app-hwro::hwro-layout>
 
-    {{-- Modal für gefundene Betriebsnummern --}}
-    <flux:modal wire:model="showResultModal" name="betriebsnr-results">
+        {{-- Modal für gefundene Betriebsnummern --}}
+        <flux:modal wire:model="showResultModal" name="betriebsnr-results">
         <flux:heading size="lg" class="mb-4">Gefundene Betriebsnummern</flux:heading>
         
         @if(count($gefundeneZuordnungen) > 0)
@@ -285,6 +276,6 @@ $abbrechenZuordnungen = function () {
                 </flux:button>
             </div>
         @endif
-    </flux:modal>
-</section>
+        </flux:modal>
+</x-intranet-app-hwro::hwro-layout>
 

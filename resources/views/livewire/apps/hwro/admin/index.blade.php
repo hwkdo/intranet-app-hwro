@@ -102,14 +102,7 @@ $runMakeBetriebsakte = function () {
 ?>
 
 <!-- Cache-Bust: {{ now()->timestamp }} -->
-<section class="w-full">
-    <div class="relative mb-6 w-full">
-        <flux:heading size="xl" level="1">Handwerksrolle Online</flux:heading>
-        <flux:subheading size="lg" class="mb-6">Admin</flux:subheading>
-        <flux:separator variant="subtle" />
-    </div>
-    
-    <x-intranet-app-hwro::hwro-layout>
+<x-intranet-app-hwro::hwro-layout heading="Admin" subheading="Verwaltung der Handwerksrolle">
 
         {{-- Flux Tabs --}}
         <flux:tab.group>
@@ -207,5 +200,4 @@ $runMakeBetriebsakte = function () {
                 </div>
             </flux:tab.panel>
         </flux:tab.group>
-    </x-intranet-app-hwro::hwro-layout>
-</section>
+</x-intranet-app-hwro::hwro-layout>
