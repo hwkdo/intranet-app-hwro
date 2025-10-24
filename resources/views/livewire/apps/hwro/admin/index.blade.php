@@ -115,6 +115,15 @@ $settingsStructure = computed(function () {
         $property = collect($properties)->first(fn ($p) => $p->getName() === $key);
         $propertyType = $property?->getType();
         
+        // Beschreibung aus PHP Attributen abrufen
+        $description = '';
+        if ($property) {
+            $attributes = $property->getAttributes(\Hwkdo\IntranetAppHwro\Data\Attributes\Description::class);
+            if (!empty($attributes)) {
+                $description = $attributes[0]->newInstance()->description;
+            }
+        }
+        
         // Prüfe ob das Property ein Enum ist
         if ($propertyType && !$propertyType->isBuiltin()) {
             $typeName = $propertyType instanceof \ReflectionNamedType ? $propertyType->getName() : null;
@@ -130,7 +139,7 @@ $settingsStructure = computed(function () {
                     'type' => 'select',
                     'options' => $options,
                     'label' => __(str_replace('_', ' ', ucfirst($key))),
-                    'description' => '',
+                    'description' => $description,
                 ];
                 
                 continue;
@@ -143,21 +152,21 @@ $settingsStructure = computed(function () {
                 'key' => $key,
                 'type' => 'switch',
                 'label' => __(str_replace('_', ' ', ucfirst($key))),
-                'description' => '',
+                'description' => $description,
             ];
         } elseif (is_numeric($value)) {
             $structure[] = [
                 'key' => $key,
                 'type' => 'number',
                 'label' => __(str_replace('_', ' ', ucfirst($key))),
-                'description' => '',
+                'description' => $description,
             ];
         } elseif (is_string($value)) {
             $structure[] = [
                 'key' => $key,
                 'type' => 'text',
                 'label' => __(str_replace('_', ' ', ucfirst($key))),
-                'description' => '',
+                'description' => $description,
             ];
         }
     }
@@ -309,26 +318,31 @@ $runMakeBetriebsakte = function () {
                             </div>
                         </div>
                         
-                        <flux:text class="mb-4 text-zinc-500 dark:text-zinc-400">
-                            Live-Übersicht der Betriebsnummern-Suchvorgänge.
+                        <flux:text class="mb-6">
+                            Live-Übersicht der Scheduler-Events.
                         </flux:text>
 
-                        <div class="mb-6 flex gap-2">
-                            <flux:button 
-                                wire:click="runSearchBetriebsnr"
-                                icon="magnifying-glass"
-                                size="sm"
-                            >
-                                Betriebsnummern suchen
-                            </flux:button>
-                            <flux:button 
-                                wire:click="runMakeBetriebsakte"
-                                icon="document-plus"
-                                size="sm"
-                                variant="outline"
-                            >
-                                Betriebsakten erstellen
-                            </flux:button>
+                        <div class="mb-6 flex items-center gap-4">
+                            <flux:text class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                                Scheduler manuell ausführen:
+                            </flux:text>
+                            <div class="flex gap-2">
+                                <flux:button 
+                                    wire:click="runSearchBetriebsnr"
+                                    icon="magnifying-glass"
+                                    size="sm"
+                                >
+                                    Betriebsnummern suchen
+                                </flux:button>
+                                <flux:button 
+                                    wire:click="runMakeBetriebsakte"
+                                    icon="document-plus"
+                                    size="sm"
+                                    variant="outline"
+                                >
+                                    Betriebsakten erstellen
+                                </flux:button>
+                            </div>
                         </div>
 
                         <flux:separator variant="subtle" class="mb-4" />
@@ -336,7 +350,7 @@ $runMakeBetriebsakte = function () {
                         <div class="space-y-2" wire:poll.visible>
                             @if(count($schedulerEvents) === 0)
                                 <div class="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-                                    <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                    <flux:text>
                                         Keine Events empfangen. Warten auf Scheduler-Aktivität...
                                     </flux:text>
                                 </div>
