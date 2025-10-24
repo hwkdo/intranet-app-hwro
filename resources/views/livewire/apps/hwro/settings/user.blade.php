@@ -48,6 +48,15 @@ $settingsStructure = computed(function () {
         $property = collect($properties)->first(fn ($p) => $p->getName() === $key);
         $propertyType = $property?->getType();
         
+        // Beschreibung aus PHP Attributen abrufen
+        $description = '';
+        if ($property) {
+            $attributes = $property->getAttributes(\Hwkdo\IntranetAppHwro\Data\Attributes\Description::class);
+            if (!empty($attributes)) {
+                $description = $attributes[0]->newInstance()->description;
+            }
+        }
+        
         // Prüfe ob das Property ein Enum ist
         if ($propertyType && !$propertyType->isBuiltin()) {
             $typeName = $propertyType instanceof \ReflectionNamedType ? $propertyType->getName() : null;
@@ -63,7 +72,7 @@ $settingsStructure = computed(function () {
                     'type' => 'select',
                     'options' => $options,
                     'label' => __(str_replace('_', ' ', ucfirst($key))),
-                    'description' => '',
+                    'description' => $description,
                 ];
                 
                 continue;
@@ -76,21 +85,21 @@ $settingsStructure = computed(function () {
                 'key' => $key,
                 'type' => 'switch',
                 'label' => __(str_replace('_', ' ', ucfirst($key))),
-                'description' => '',
+                'description' => $description,
             ];
         } elseif (is_numeric($value)) {
             $structure[] = [
                 'key' => $key,
                 'type' => 'number',
                 'label' => __(str_replace('_', ' ', ucfirst($key))),
-                'description' => '',
+                'description' => $description,
             ];
         } elseif (is_string($value)) {
             $structure[] = [
                 'key' => $key,
                 'type' => 'text',
                 'label' => __(str_replace('_', ' ', ucfirst($key))),
-                'description' => '',
+                'description' => $description,
             ];
         }
     }
