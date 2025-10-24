@@ -21,7 +21,7 @@
     :subheading="$subheading"
     :nav-items="$navItems"
 >
-    @if(str_contains(request()->url(), '/apps/hwro') && !str_contains(request()->url(), '/settings/') && !str_contains(request()->url(), '/admin'))
+    @if(request()->routeIs('apps.hwro.index'))
         <x-intranet-app-base::app-index-auto 
             app-identifier="hwro"
             app-name="Handwerksrolle Online"
