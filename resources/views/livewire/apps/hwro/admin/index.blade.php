@@ -185,7 +185,7 @@ $clearSchedulerEvents = function () {
 };
 
 $runSearchBetriebsnr = function () {
-    \Artisan::call('intranet-app-hwro:search-betriebsnr');
+    \Illuminate\Support\Facades\Artisan::call('intranet-app-hwro:search-betriebsnr');
     
     Flux::toast(
         heading: 'Command gestartet',
@@ -195,7 +195,7 @@ $runSearchBetriebsnr = function () {
 };
 
 $runMakeBetriebsakte = function () {
-    \Artisan::call('intranet-app-hwro:make-betriebsakte');
+    \Illuminate\Support\Facades\Artisan::call('intranet-app-hwro:make-betriebsakte');
     
     Flux::toast(
         heading: 'Command gestartet',
@@ -216,166 +216,154 @@ $runMakeBetriebsakte = function () {
     
     <x-intranet-app-hwro::hwro-layout>
 
-        {{-- Tabs mit Livewire --}}
-        <div>
-            <div class="mb-6 border-b border-zinc-200 dark:border-zinc-700">
-                <div class="flex gap-4">
-                    <button 
-                        wire:click="$set('activeTab', 'einstellungen')"
-                        class="px-4 py-2 -mb-px border-b-2 transition-colors {{ $activeTab === 'einstellungen' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}"
-                    >
-                        Einstellungen
-                    </button>
-                    <button 
-                        wire:click="$set('activeTab', 'scheduler')"
-                        class="px-4 py-2 -mb-px border-b-2 transition-colors {{ $activeTab === 'scheduler' ? 'border-blue-500 text-blue-600 dark:text-blue-400' : 'border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200' }}"
-                    >
-                        Scheduler
-                    </button>
-                </div>
-            </div>
-
-            @if($activeTab === 'einstellungen')
-            <div style="min-height: 400px;">
-            <flux:card>
-                <flux:heading size="lg" class="mb-4">Administrator-Einstellungen</flux:heading>
-                <flux:text class="mb-6">
-                    Verwalten Sie die globalen Einstellungen für die Handwerksrolle-App.
-                </flux:text>
-                
-                <div class="space-y-4">
-                    @foreach($this->settingsStructure as $field)
-                            @if($field['type'] === 'switch')
-                                <flux:switch 
-                                    wire:model.live="appSettings.{{ $field['key'] }}" 
-                                    :label="$field['label']"
-                                    :description="$field['description']"
-                                />
-                                @if(!$loop->last)
-                                    <flux:separator variant="subtle" />
-                                @endif
-                            @elseif($field['type'] === 'number')
-                                <flux:input 
-                                    type="number"
-                                    wire:model="appSettings.{{ $field['key'] }}" 
-                                    :label="$field['label']"
-                                    :description="$field['description']"
-                                />
-                                @if(!$loop->last)
-                                    <flux:separator variant="subtle" />
-                                @endif
-                            @elseif($field['type'] === 'text')
-                                <flux:input 
-                                    type="text"
-                                    wire:model="appSettings.{{ $field['key'] }}" 
-                                    :label="$field['label']"
-                                    :description="$field['description']"
-                                />
-                                @if(!$loop->last)
-                                    <flux:separator variant="subtle" />
-                                @endif
-                            @elseif($field['type'] === 'select')
-                                <flux:select 
-                                    wire:model="appSettings.{{ $field['key'] }}"
-                                    variant="listbox"
-                                    :label="$field['label']"
-                                    :description="$field['description']"
-                                >
-                                    @foreach($field['options'] as $value => $label)
-                                        <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
-                                    @endforeach
-                                </flux:select>
-                                @if(!$loop->last)
-                                    <flux:separator variant="subtle" />
-                                @endif
-                            @endif
-                        @endforeach
-                    </div>
-                    
-                </div>
-                
-                <div class="mt-6 flex justify-end">
-                    <flux:button wire:click="save" variant="primary">
-                        Einstellungen speichern
-                    </flux:button>
-                </div>
-            </flux:card>
-            </div>
-            @endif
-
-            @if($activeTab === 'scheduler')
-            <div style="min-height: 400px;">
-                <flux:card>
-                    <div class="mb-4 flex items-center justify-between">
-                        <flux:heading size="lg">Scheduler Events</flux:heading>
-                        <div class="flex gap-2">
-                            @if(count($schedulerEvents) > 0)
-                                <flux:button 
-                                    wire:click="clearSchedulerEvents"
-                                    variant="ghost"
-                                    size="sm"
-                                >
-                                    Liste leeren
-                                </flux:button>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    <flux:text class="mb-4 text-zinc-500 dark:text-zinc-400">
-                        Live-Übersicht der Betriebsnummern-Suchvorgänge.
-                    </flux:text>
-
-                    <div class="mb-6 flex gap-2">
-                        <flux:button 
-                            wire:click="runSearchBetriebsnr"
-                            icon="magnifying-glass"
-                            size="sm"
-                        >
-                            Betriebsnummern suchen
-                        </flux:button>
-                        <flux:button 
-                            wire:click="runMakeBetriebsakte"
-                            icon="document-plus"
-                            size="sm"
-                            variant="outline"
-                        >
-                            Betriebsakten erstellen
-                        </flux:button>
-                    </div>
-
-                    <flux:separator variant="subtle" class="mb-4" />
-
-                    <div class="space-y-2" wire:poll.visible>
-                        @if(count($schedulerEvents) === 0)
-                            <div class="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
-                                <flux:text class="text-zinc-500 dark:text-zinc-400">
-                                    Keine Events empfangen. Warten auf Scheduler-Aktivität...
-                                </flux:text>
+        {{-- Flux Tabs --}}
+        <flux:tab.group>
+            <flux:tabs wire:model="activeTab">
+                <flux:tab name="einstellungen" icon="cog-6-tooth">Einstellungen</flux:tab>
+                <flux:tab name="scheduler" icon="clock">Scheduler</flux:tab>
+            </flux:tabs>
+            
+            <flux:tab.panel name="einstellungen">
+                <div style="min-height: 400px;">
+                    <flux:card>
+                        <flux:heading size="lg" class="mb-4">Administrator-Einstellungen</flux:heading>
+                        <flux:text class="mb-6">
+                            Verwalten Sie die globalen Einstellungen für die Handwerksrolle-App.
+                        </flux:text>
+                        
+                        <div class="space-y-4">
+                            @foreach($this->settingsStructure as $field)
+                                    @if($field['type'] === 'switch')
+                                        <flux:switch 
+                                            wire:model.live="appSettings.{{ $field['key'] }}" 
+                                            :label="$field['label']"
+                                            :description="$field['description']"
+                                        />
+                                        @if(!$loop->last)
+                                            <flux:separator variant="subtle" />
+                                        @endif
+                                    @elseif($field['type'] === 'number')
+                                        <flux:input 
+                                            type="number"
+                                            wire:model="appSettings.{{ $field['key'] }}" 
+                                            :label="$field['label']"
+                                            :description="$field['description']"
+                                        />
+                                        @if(!$loop->last)
+                                            <flux:separator variant="subtle" />
+                                        @endif
+                                    @elseif($field['type'] === 'text')
+                                        <flux:input 
+                                            type="text"
+                                            wire:model="appSettings.{{ $field['key'] }}" 
+                                            :label="$field['label']"
+                                            :description="$field['description']"
+                                        />
+                                        @if(!$loop->last)
+                                            <flux:separator variant="subtle" />
+                                        @endif
+                                    @elseif($field['type'] === 'select')
+                                        <flux:select 
+                                            wire:model="appSettings.{{ $field['key'] }}"
+                                            variant="listbox"
+                                            :label="$field['label']"
+                                            :description="$field['description']"
+                                        >
+                                            @foreach($field['options'] as $value => $label)
+                                                <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
+                                            @endforeach
+                                        </flux:select>
+                                        @if(!$loop->last)
+                                            <flux:separator variant="subtle" />
+                                        @endif
+                                    @endif
+                                @endforeach
                             </div>
-                        @else
-                            @foreach($schedulerEvents as $event)
-                                <div 
-                                    class="rounded-lg border p-4 @if($event['variant'] === 'info') border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30 @elseif($event['variant'] === 'success') border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 @elseif($event['variant'] === 'warning') border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30 @else border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50 @endif"
-                                    wire:key="event-{{ $event['id'] }}"
-                                >
-                                    <div class="flex items-start justify-between gap-4">
-                                        <div class="flex-1 min-w-0">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium @if($event['variant'] === 'info') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @elseif($event['variant'] === 'success') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 @elseif($event['variant'] === 'warning') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @else bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 @endif">
-                                                    {{ $event['type'] }}
-                                                </span>
-                                                <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $event['timestamp'] }}</span>
+                            
+                        
+                        
+                        <div class="mt-6 flex justify-end">
+                            <flux:button wire:click="save" variant="primary">
+                                Einstellungen speichern
+                            </flux:button>
+                        </div>
+                    </flux:card>
+                </div>
+            </flux:tab.panel>
+
+            <flux:tab.panel name="scheduler">
+                <div style="min-height: 400px;">
+                    <flux:card>
+                        <div class="mb-4 flex items-center justify-between">
+                            <flux:heading size="lg">Scheduler Events</flux:heading>
+                            <div class="flex gap-2">
+                                @if(count($schedulerEvents) > 0)
+                                    <flux:button 
+                                        wire:click="clearSchedulerEvents"
+                                        variant="ghost"
+                                        size="sm"
+                                    >
+                                        Liste leeren
+                                    </flux:button>
+                                @endif
+                            </div>
+                        </div>
+                        
+                        <flux:text class="mb-4 text-zinc-500 dark:text-zinc-400">
+                            Live-Übersicht der Betriebsnummern-Suchvorgänge.
+                        </flux:text>
+
+                        <div class="mb-6 flex gap-2">
+                            <flux:button 
+                                wire:click="runSearchBetriebsnr"
+                                icon="magnifying-glass"
+                                size="sm"
+                            >
+                                Betriebsnummern suchen
+                            </flux:button>
+                            <flux:button 
+                                wire:click="runMakeBetriebsakte"
+                                icon="document-plus"
+                                size="sm"
+                                variant="outline"
+                            >
+                                Betriebsakten erstellen
+                            </flux:button>
+                        </div>
+
+                        <flux:separator variant="subtle" class="mb-4" />
+
+                        <div class="space-y-2" wire:poll.visible>
+                            @if(count($schedulerEvents) === 0)
+                                <div class="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                                    <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                        Keine Events empfangen. Warten auf Scheduler-Aktivität...
+                                    </flux:text>
+                                </div>
+                            @else
+                                @foreach($schedulerEvents as $event)
+                                    <div 
+                                        class="rounded-lg border p-4 @if($event['variant'] === 'info') border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30 @elseif($event['variant'] === 'success') border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 @elseif($event['variant'] === 'warning') border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30 @else border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50 @endif"
+                                        wire:key="event-{{ $event['id'] }}"
+                                    >
+                                        <div class="flex items-start justify-between gap-4">
+                                            <div class="flex-1 min-w-0">
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium @if($event['variant'] === 'info') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @elseif($event['variant'] === 'success') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 @elseif($event['variant'] === 'warning') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @else bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 @endif">
+                                                        {{ $event['type'] }}
+                                                    </span>
+                                                    <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $event['timestamp'] }}</span>
+                                                </div>
+                                                <p class="text-sm text-zinc-900 dark:text-zinc-100 break-words">{{ $event['message'] }}</p>
                                             </div>
-                                            <p class="text-sm text-zinc-900 dark:text-zinc-100 break-words">{{ $event['message'] }}</p>
                                         </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
-                </flux:card>
-            </div>
-            @endif
-        </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </flux:card>
+                </div>
+            </flux:tab.panel>
+        </flux:tab.group>
     </x-intranet-app-hwro::hwro-layout>
 </section>
