@@ -13,6 +13,8 @@ state([
     'search' => '',
     'gefundeneZuordnungen' => [],
     'showResultModal' => false,
+    'sortBy' => 'vorgangsnummer',
+    'sortDirection' => 'asc',
 ]);
 
 mount(function () {
@@ -33,12 +35,21 @@ $vorgaenge = computed(function () {
             $q->where('vorgangsnummer', 'like', "%{$this->search}%")
               ->orWhere('betriebsnr', 'like', "%{$this->search}%");
         }))
-        ->orderBy('vorgangsnummer')
+        ->when($this->sortBy, fn($query) => $query->orderBy($this->sortBy, $this->sortDirection))
         ->paginate(15);
 });
 
 $setFilter = function (string $filter) {
     $this->filter = $filter;
+};
+
+$sort = function (string $column) {
+    if ($this->sortBy === $column) {
+        $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        $this->sortBy = $column;
+        $this->sortDirection = 'asc';
+    }
 };
 
 $alleBetriebenrPruefen = function () {
@@ -172,9 +183,30 @@ $abbrechenZuordnungen = function () {
 
             <flux:table :paginate="$this->vorgaenge">
                 <flux:table.columns>
-                    <flux:table.column>Vorgangsnummer</flux:table.column>
-                    <flux:table.column>Betriebsnr</flux:table.column>
-                    <flux:table.column>Erstellt</flux:table.column>
+                    <flux:table.column 
+                        sortable 
+                        :sorted="$sortBy === 'vorgangsnummer'" 
+                        :direction="$sortDirection" 
+                        wire:click="sort('vorgangsnummer')"
+                    >
+                        Vorgangsnummer
+                    </flux:table.column>
+                    <flux:table.column 
+                        sortable 
+                        :sorted="$sortBy === 'betriebsnr'" 
+                        :direction="$sortDirection" 
+                        wire:click="sort('betriebsnr')"
+                    >
+                        Betriebsnr
+                    </flux:table.column>
+                    <flux:table.column 
+                        sortable 
+                        :sorted="$sortBy === 'created_at'" 
+                        :direction="$sortDirection" 
+                        wire:click="sort('created_at')"
+                    >
+                        Erstellt
+                    </flux:table.column>
                     <flux:table.column>Aktionen</flux:table.column>
                 </flux:table.columns>
                 <flux:table.rows>
