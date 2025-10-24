@@ -21,6 +21,17 @@
     :subheading="$subheading"
     :nav-items="$navItems"
 >
-    {{ $slot }}
+    @if(str_contains(request()->url(), '/apps/hwro') && !str_contains(request()->url(), '/settings/') && !str_contains(request()->url(), '/admin'))
+        <x-intranet-app-base::app-index-auto 
+            app-identifier="hwro"
+            app-name="Handwerksrolle Online"
+            app-description="Verwaltung der Handwerksrolle"
+            :nav-items="$navItems"
+            welcome-title="Willkommen in der Handwerksrolle"
+            welcome-description="Hier können Sie alle Aspekte der Handwerksrolle verwalten."
+        />
+    @else
+        {{ $slot }}
+    @endif
 </x-intranet-app-base::app-layout>
 
