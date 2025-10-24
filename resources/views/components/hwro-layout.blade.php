@@ -1,24 +1,26 @@
-<div class="flex items-start max-md:flex-col">
-    <div class="mr-10 w-full pb-4 md:w-[220px]">
-        <flux:navlist>
-            <flux:navlist.item :href="route('apps.hwro.index')" wire:navigate>Übersicht</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.vorgaenge.index')" wire:navigate>Vorgänge</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.settings.user')" wire:navigate>Meine Einstellungen</flux:navlist.item>
-            @can('manage-app-hwro')
-                <flux:navlist.item :href="route('apps.hwro.admin.index')" wire:navigate>Admin</flux:navlist.item>
-            @endcan
-        </flux:navlist>
-    </div>
+@props([
+    'heading' => '',
+    'subheading' => '',
+    'navItems' => []
+])
 
-    <flux:separator class="md:hidden" />
+@php
+    $defaultNavItems = [
+        ['label' => 'Übersicht', 'href' => route('apps.hwro.index'), 'icon' => 'home', 'description' => 'Zurück zur Übersicht', 'buttonText' => 'Übersicht anzeigen'],
+        ['label' => 'Vorgänge', 'href' => route('apps.hwro.vorgaenge.index'), 'icon' => 'clipboard-document-list', 'description' => 'Vorgänge verwalten', 'buttonText' => 'Vorgänge anzeigen'],
+        ['label' => 'Meine Einstellungen', 'href' => route('apps.hwro.settings.user'), 'icon' => 'cog-6-tooth', 'description' => 'Persönliche Einstellungen anpassen', 'buttonText' => 'Einstellungen öffnen'],
+        ['label' => 'Admin', 'href' => route('apps.hwro.admin.index'), 'icon' => 'shield-check', 'description' => 'Administrationsbereich verwalten', 'buttonText' => 'Admin öffnen', 'permission' => 'manage-app-hwro']
+    ];
+    
+    $navItems = !empty($navItems) ? $navItems : $defaultNavItems;
+@endphp
 
-    <div class="flex-1 self-stretch max-md:pt-6">
-        <flux:heading>{{ $heading ?? '' }}</flux:heading>
-        <flux:subheading>{{ $subheading ?? '' }}</flux:subheading>
-
-        <div class="mt-5 w-full">
-            {{ $slot }}
-        </div>
-    </div>
-</div>
+<x-intranet-app-base::app-layout 
+    app-identifier="hwro"
+    :heading="$heading"
+    :subheading="$subheading"
+    :nav-items="$navItems"
+>
+    {{ $slot }}
+</x-intranet-app-base::app-layout>
 
