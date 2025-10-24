@@ -215,14 +215,6 @@ $runMakeBetriebsakte = function () {
     </div>
     
     <x-intranet-app-hwro::hwro-layout>
-        <x-slot:navigation>
-            <flux:navlist.item :href="route('apps.hwro.index')" wire:navigate>Übersicht</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.vorgaenge.index')" wire:navigate>Vorgänge</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.settings.user')" wire:navigate>Meine Einstellungen</flux:navlist.item>
-            @can('manage-app-hwro')
-                <flux:navlist.item :href="route('apps.hwro.admin.index')" wire:navigate current>Admin</flux:navlist.item>
-            @endcan
-        </x-slot:navigation>
 
         {{-- Tabs mit Livewire --}}
         <div>

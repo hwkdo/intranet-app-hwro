@@ -121,15 +121,6 @@ $uebertragenAusOnlineEintragung = function () {
     <x-intranet-app-hwro::hwro-layout>
         <x-slot:heading>Vorgang anzeigen</x-slot:heading>
         <x-slot:subheading>Details zum Vorgang {{ $vorgang->vorgangsnummer }}</x-slot:subheading>
-        
-        <x-slot:navigation>
-            <flux:navlist.item :href="route('apps.hwro.index')" wire:navigate>Übersicht</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.vorgaenge.index')" wire:navigate>Vorgänge</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.settings.user')" wire:navigate>Meine Einstellungen</flux:navlist.item>
-            @can('manage-app-hwro')
-                <flux:navlist.item :href="route('apps.hwro.admin.index')" wire:navigate>Admin</flux:navlist.item>
-            @endcan
-        </x-slot:navigation>
 
         <div class="space-y-6">
             <flux:card>

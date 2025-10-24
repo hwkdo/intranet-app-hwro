@@ -119,15 +119,6 @@ $abbrechenZuordnungen = function () {
     <x-intranet-app-hwro::hwro-layout>
         <x-slot:heading>Vorgänge</x-slot:heading>
         <x-slot:subheading>Verwalten Sie hier alle Vorgänge der Handwerksrolle</x-slot:subheading>
-        
-        <x-slot:navigation>
-            <flux:navlist.item :href="route('apps.hwro.index')" wire:navigate>Übersicht</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.vorgaenge.index')" wire:navigate current>Vorgänge</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.settings.user')" wire:navigate>Meine Einstellungen</flux:navlist.item>
-            @can('manage-app-hwro')
-                <flux:navlist.item :href="route('apps.hwro.admin.index')" wire:navigate>Admin</flux:navlist.item>
-            @endcan
-        </x-slot:navigation>
 
         <div class="space-y-6">
             <div class="flex items-center justify-between gap-4">

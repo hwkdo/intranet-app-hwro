@@ -42,15 +42,6 @@ $save = function () {
     <x-intranet-app-hwro::hwro-layout>
         <x-slot:heading>Neuer Vorgang</x-slot:heading>
         <x-slot:subheading>Erstellen Sie einen neuen Vorgang</x-slot:subheading>
-        
-        <x-slot:navigation>
-            <flux:navlist.item :href="route('apps.hwro.index')" wire:navigate>Übersicht</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.vorgaenge.index')" wire:navigate>Vorgänge</flux:navlist.item>
-            <flux:navlist.item :href="route('apps.hwro.settings.user')" wire:navigate>Meine Einstellungen</flux:navlist.item>
-            @can('manage-app-hwro')
-                <flux:navlist.item :href="route('apps.hwro.admin.index')" wire:navigate>Admin</flux:navlist.item>
-            @endcan
-        </x-slot:navigation>
 
         <flux:card>
             <flux:heading size="lg" class="mb-6">Neuer Vorgang</flux:heading>
