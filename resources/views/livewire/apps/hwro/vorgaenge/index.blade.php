@@ -4,7 +4,9 @@ use Flux\Flux;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Support\Facades\Auth;
-use function Livewire\Volt\{state, title, computed, mount};
+use function Livewire\Volt\{state, title, computed, mount, usesPagination};
+
+usesPagination();
 
 title('Vorgänge - Handwerksrolle Online');
 
@@ -109,7 +111,7 @@ $abbrechenZuordnungen = function () {
 };
 
 ?>
-
+<div>
 <x-intranet-app-hwro::hwro-layout heading="Vorgänge" subheading="Verwalten Sie hier alle Vorgänge der Handwerksrolle">
 
         <div class="space-y-6">
@@ -231,7 +233,9 @@ $abbrechenZuordnungen = function () {
             </flux:table>
         </div>
 
-        {{-- Modal für gefundene Betriebsnummern --}}
+       
+</x-intranet-app-hwro::hwro-layout>
+{{-- Modal für gefundene Betriebsnummern --}}
         <flux:modal wire:model="showResultModal" name="betriebsnr-results">
         <flux:heading size="lg" class="mb-4">Gefundene Betriebsnummern</flux:heading>
         
@@ -277,5 +281,4 @@ $abbrechenZuordnungen = function () {
             </div>
         @endif
         </flux:modal>
-</x-intranet-app-hwro::hwro-layout>
-
+</div>
