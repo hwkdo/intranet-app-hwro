@@ -47,9 +47,14 @@ $save = function () {
     
     if ($this->datei) {
         $schlagwort = Schlagwort::find($this->schlagwort_id);
-        $dokument->addMedia($this->datei->getRealPath())
+        
+        // Dateiname immer mit .pdf Endung, da Konvertierung erfolgt
+        $originalName = $this->datei->getClientOriginalName();
+        $pdfName = pathinfo($originalName, PATHINFO_FILENAME) . '.pdf';
+        
+        $dokument->addMediaWithPdfConversion($this->datei->getRealPath())
             ->usingName($schlagwort->schlagwort)
-            ->usingFileName($this->datei->getClientOriginalName())
+            ->usingFileName($pdfName)
             ->toMediaCollection('default');
     }
     
