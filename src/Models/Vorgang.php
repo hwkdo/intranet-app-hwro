@@ -8,10 +8,14 @@ use Hwkdo\IntranetAppHwro\Services\d3Service;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Vorgang extends Model
+class Vorgang extends Model implements HasMedia
 {
     use HasFactory;
+    use InteractsWithMedia;
+    
     protected $table = 'intranet_app_hwro_vorgangs';
 
     protected $fillable = ['vorgangsnummer', 'betriebsnr'];
@@ -27,6 +31,9 @@ class Vorgang extends Model
                 // Lösche das Dokument selbst
                 $dokument->delete();
             }
+            
+            // Lösche auch die GEWAN-Media-Datei
+            $vorgang->clearMediaCollection('gewan');
         });
     }
 
@@ -36,6 +43,13 @@ class Vorgang extends Model
             'vorgangsnummer' => 'integer',
             'betriebsnr' => 'integer',
         ];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('gewan')
+            ->singleFile()
+            ->useDisk('intranet-app-hwro');
     }
 
     public function bueBetrieb()

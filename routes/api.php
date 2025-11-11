@@ -6,7 +6,8 @@ use Hwkdo\IntranetAppHwro\Models\Vorgang;
 
 Route::middleware(['auth:sanctum','can:manage-app-hwro'])
 ->prefix('api')
-->group(function () {    
+->group(function () {  
+
     Route::post('apps/hwro', function (Request $request) {
         $validated = $request->validate([
             'vorgangsnummer' => 'required|integer',
@@ -20,4 +21,38 @@ Route::middleware(['auth:sanctum','can:manage-app-hwro'])
 
         return response()->json($vorgang, 201);
     })->name('api.apps.hwro.store');
+
+    Route::post('apps/hwro/vorgang/{vorgang:vorgangsnummer}/gewan', function (Request $request, Vorgang $vorgang) {
+        $validated = $request->validate([
+            'gewan' => 'required|string',
+        ]);
+
+        // Erstelle temporäre XML-Datei aus dem String
+        $tempPath = tempnam(sys_get_temp_dir(), 'gewan_');
+        $xmlFilename = 'gewan_' . $vorgang->vorgangsnummer . '_' . now()->format('Y-m-d_H-i-s') . '.xml';
+        file_put_contents($tempPath, $validated['gewan']);
+
+        try {
+            // Füge die XML-Datei zur "gewan" Collection hinzu
+            $vorgang->addMedia($tempPath)
+                ->usingFileName($xmlFilename)
+                ->toMediaCollection('gewan');
+
+            // Lösche die temporäre Datei
+            @unlink($tempPath);
+
+            return response()->json([
+                'message' => 'GEWAN-Datei erfolgreich gespeichert',
+                'vorgang' => $vorgang,
+                'media' => $vorgang->getFirstMedia('gewan'),
+            ], 200);
+        } catch (\Exception $e) {
+            // Lösche die temporäre Datei im Fehlerfall
+            @unlink($tempPath);
+            
+            return response()->json([
+                'message' => 'Fehler beim Speichern der GEWAN-Datei: ' . $e->getMessage(),
+            ], 500);
+        }
+    })->name('api.apps.hwro.vorgang.gewan.store');
 });
