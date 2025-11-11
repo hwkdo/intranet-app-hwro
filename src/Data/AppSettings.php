@@ -19,6 +19,9 @@ class AppSettings extends BaseAppSettings
         
         #[Description('Intervall in Minuten für die Erstellung von Betriebsakten (Standard: 15 Minuten)')]
         public int $scheduleMakeBetriebsakteIntervalMinutes = 15,
+
+        #[Description('Das Standard-Schlagwort für die Erstellung von Betriebsakten, wenn kein Filename passend ist')]
+        public string $defaultSchlagwort = 'Antrag auf Eintragung',
     ) {}
 
 }

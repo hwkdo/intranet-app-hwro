@@ -14,12 +14,25 @@ state([
     'vorgang',
     'gefundeneBetriebsnr' => null,
     'showModal' => false,
+    'showSchlagwortModal' => false,
+    'editingDokument' => null,
+    'selectedSchlagwortId' => null,
 ]);
 
 mount(function (Vorgang $vorgang) {
     $this->vorgang = $vorgang;
 
     $this->title = 'Vorgang '.$vorgang->vorgangsnummer.' - Handwerksrolle Online';
+});
+
+$lokaleDokumente = computed(function () {
+    return $this->vorgang->dokumente()
+        ->with(['schlagwort', 'media'])
+        ->get();
+});
+
+$alleSchlagworte = computed(function () {
+    return \Hwkdo\IntranetAppHwro\Models\Schlagwort::orderBy('schlagwort')->get();
 });
 
 $dokumente = computed(function () {
@@ -86,6 +99,37 @@ $abbrechenBetriebsnr = function () {
     $this->showModal = false;
 };
 
+$oeffneSchlagwortModal = function ($dokumentId) {
+    $dokument = \Hwkdo\IntranetAppHwro\Models\Dokument::find($dokumentId);
+    
+    if ($dokument) {
+        $this->editingDokument = $dokument;
+        $this->selectedSchlagwortId = $dokument->schlagwort_id;
+        $this->showSchlagwortModal = true;
+    }
+};
+
+$speichernSchlagwort = function () {
+    if ($this->editingDokument && $this->selectedSchlagwortId) {
+        $this->editingDokument->update(['schlagwort_id' => $this->selectedSchlagwortId]);
+        
+        // Invalidiere das computed property
+        unset($this->lokaleDokumente);
+        
+        $this->editingDokument = null;
+        $this->selectedSchlagwortId = null;
+        $this->showSchlagwortModal = false;
+        
+        Flux::toast(text: 'Schlagwort erfolgreich aktualisiert!', variant: 'success');
+    }
+};
+
+$abbrechenSchlagwort = function () {
+    $this->editingDokument = null;
+    $this->selectedSchlagwortId = null;
+    $this->showSchlagwortModal = false;
+};
+
 $uebertragenAusOnlineEintragung = function () {
     $result = $this->vorgang->makeD3Betriebsakte();
     
@@ -105,6 +149,29 @@ $uebertragenAusOnlineEintragung = function () {
     } else {
         Flux::toast(
             text: 'Keine Dokumente zum Übertragen gefunden.',
+            variant: 'warning'
+        );
+    }
+};
+
+$uebertragenAusLokalenDokumenten = function () {
+    $result = $this->vorgang->makeD3BetriebsakteFromLocal();
+    
+    if ($result && $result['success']) {
+        unset($this->betriebsakteDokumente);
+        
+        Flux::toast(
+            text: 'Lokale Dokumente erfolgreich in die Betriebsakte übertragen!',
+            variant: 'success'
+        );
+    } elseif ($result) {
+        Flux::toast(
+            text: 'Fehler beim Übertragen: ' . ($result['message'] ?? 'Unbekannter Fehler'),
+            variant: 'danger'
+        );
+    } else {
+        Flux::toast(
+            text: 'Keine lokalen Dokumente zum Übertragen gefunden.',
             variant: 'warning'
         );
     }
@@ -172,6 +239,63 @@ $uebertragenAusOnlineEintragung = function () {
             </flux:card>
 
             <flux:card>
+                <flux:heading size="lg" class="mb-4">Dokumente Lokal</flux:heading>
+                
+                @if($this->lokaleDokumente->isEmpty())
+                    <flux:text class="text-zinc-500 dark:text-zinc-400">
+                        Keine lokalen Dokumente gefunden.
+                    </flux:text>
+                @else
+                    <div class="space-y-3">
+                        @foreach($this->lokaleDokumente as $dokument)
+                            @php
+                                $media = $dokument->getFirstMedia();
+                            @endphp
+                            @if($media)
+                                <div class="flex items-center justify-between rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                                    <div class="flex items-center gap-3">
+                                        <flux:icon name="document" class="size-6 text-zinc-500 dark:text-zinc-400" />
+                                        <div>
+                                            <flux:text class="font-medium">{{ $media->file_name }}</flux:text>
+                                            <div class="flex items-center gap-2">
+                                                @if($dokument->schlagwort)
+                                                    <flux:text size="sm" class="text-zinc-500">
+                                                        Schlagwort: {{ $dokument->schlagwort->schlagwort }}
+                                                    </flux:text>
+                                                @else
+                                                    <flux:text size="sm" class="text-zinc-500">
+                                                        Kein Schlagwort
+                                                    </flux:text>
+                                                @endif
+                                                <flux:button 
+                                                    size="xs" 
+                                                    variant="ghost"
+                                                    icon="pencil"
+                                                    wire:click="oeffneSchlagwortModal({{ $dokument->id }})"
+                                                >
+                                                </flux:button>
+                                            </div>
+                                            <flux:text size="sm" class="text-zinc-500">
+                                                Erstellt: {{ $dokument->created_at->format('d.m.Y H:i') }}
+                                            </flux:text>
+                                        </div>
+                                    </div>
+                                    <flux:button 
+                                        size="sm" 
+                                        variant="primary"
+                                        icon="arrow-down-tray"
+                                        href="{{ route('apps.hwro.dokumente.download', $dokument) }}"
+                                    >
+                                        Herunterladen
+                                    </flux:button>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                @endif
+            </flux:card>
+
+            <flux:card>
                 <flux:heading size="lg" class="mb-4">D3 Dokumente Online Eintragung</flux:heading>
                 
                 @if($this->dokumente->isEmpty())
@@ -226,6 +350,15 @@ $uebertragenAusOnlineEintragung = function () {
                                         wire:click="uebertragenAusOnlineEintragung"
                                     >
                                         Übertragen aus Online Eintragung
+                                    </flux:button>
+                                @endif
+                                @if(!$this->lokaleDokumente->isEmpty())
+                                    <flux:button 
+                                        variant="primary"
+                                        icon="arrow-path"
+                                        wire:click="uebertragenAusLokalenDokumenten"
+                                    >
+                                        Übertragen aus Lokalen Dokumenten
                                     </flux:button>
                                 @endif
                             </div>
@@ -310,6 +443,38 @@ $uebertragenAusOnlineEintragung = function () {
             </flux:button>
             <flux:button variant="primary" wire:click="speichernBetriebsnr">
                 Ja, speichern
+            </flux:button>
+        </div>
+    </flux:modal>
+
+    {{-- Modal für Schlagwort-Bearbeitung --}}
+    <flux:modal wire:model="showSchlagwortModal" name="schlagwort-edit">
+        <flux:heading size="lg" class="mb-4">Schlagwort bearbeiten</flux:heading>
+        
+        @if($editingDokument)
+            <div class="mb-6">
+                <flux:text class="mb-2 font-medium">
+                    Dokument: {{ $editingDokument->getFirstMedia()?->file_name }}
+                </flux:text>
+                
+                <flux:field>
+                    <flux:label>Schlagwort</flux:label>
+                    <flux:select wire:model="selectedSchlagwortId">
+                        <option value="">-- Bitte wählen --</option>
+                        @foreach($this->alleSchlagworte as $schlagwort)
+                            <option value="{{ $schlagwort->id }}">{{ $schlagwort->schlagwort }}</option>
+                        @endforeach
+                    </flux:select>
+                </flux:field>
+            </div>
+        @endif
+        
+        <div class="flex justify-end gap-2">
+            <flux:button variant="ghost" wire:click="abbrechenSchlagwort">
+                Abbrechen
+            </flux:button>
+            <flux:button variant="primary" wire:click="speichernSchlagwort">
+                Speichern
             </flux:button>
         </div>
     </flux:modal>

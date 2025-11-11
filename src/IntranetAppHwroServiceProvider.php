@@ -37,4 +37,11 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/console.php');
     }
+
+    public function register(): void
+    {
+        parent::register();
+        $this->mergeConfigFrom(__DIR__ . '/../config/intranet-app-hwro-disk.php', 'filesystems.disks.intranet-app-hwro');
+        $this->mergeConfigFrom(__DIR__ . '/../config/intranet-app-hwro-medialibrary.php', 'media-library.custom_path_generators');
+    }
 }

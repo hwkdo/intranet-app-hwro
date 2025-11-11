@@ -5,13 +5,30 @@ namespace Hwkdo\IntranetAppHwro\Models;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\D3RestLaravel\Client as D3Client;
 use Hwkdo\IntranetAppHwro\Services\d3Service;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vorgang extends Model
 {
+    use HasFactory;
     protected $table = 'intranet_app_hwro_vorgangs';
 
     protected $fillable = ['vorgangsnummer', 'betriebsnr'];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Vorgang $vorgang) {
+            // Lösche alle Dokumente mit ihren Media-Dateien
+            foreach ($vorgang->dokumente as $dokument) {
+                // Lösche alle Media-Dateien des Dokuments
+                $dokument->clearMediaCollection();
+                
+                // Lösche das Dokument selbst
+                $dokument->delete();
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -150,6 +167,77 @@ class Vorgang extends Model
         }
     }
 
+    public function makeD3BetriebsakteFromLocal()
+    {
+        if (! $this->betriebsnr) {
+            return null;
+        }
+
+        $d3Service = app(d3Service::class);
+
+        // Hole alle lokalen Dokumente mit Schlagwort und Media
+        $dokumente = $this->dokumente()
+            ->with(['schlagwort', 'media'])
+            ->get();
+
+        if ($dokumente->isEmpty()) {
+            return null;
+        }
+
+        $uploadedCount = 0;
+        $errors = [];
+
+        // Übertrage jedes Dokument einzeln
+        foreach ($dokumente as $dokument) {
+            // Überspringe Dokumente ohne Schlagwort
+            if (! $dokument->schlagwort) {
+                continue;
+            }
+
+            // Hole die Media-Datei
+            $media = $dokument->getFirstMedia();
+            
+            if (! $media) {
+                continue;
+            }
+
+            try {
+                // Lade das Dokument zu D3 hoch
+                $result = $d3Service->FormwerkEintragungToD3(
+                    $this->betriebsnr,
+                    $media->getPath(),
+                    $dokument->schlagwort->schlagwort
+                );
+
+                if ($result->success) {
+                    $uploadedCount++;
+                } else {
+                    $errors[] = 'Fehler beim Hochladen von '.$media->file_name.': '.$result->message;
+                }
+            } catch (\Exception $e) {
+                $errors[] = 'Fehler beim Hochladen von '.$media->file_name.': '.$e->getMessage();
+            }
+        }
+
+        // Rückgabe der Ergebnisse
+        if ($uploadedCount > 0) {
+            return [
+                'success' => true,
+                'message' => $uploadedCount.' Dokument(e) erfolgreich übertragen',
+                'uploaded_count' => $uploadedCount,
+                'errors' => $errors,
+            ];
+        } elseif (! empty($errors)) {
+            return [
+                'success' => false,
+                'message' => 'Fehler beim Übertragen: '.implode(', ', $errors),
+                'errors' => $errors,
+            ];
+        }
+
+        return null;
+    }
+
     public function getD3OnlineEintragung()
     {
         return app(d3Service::class)->getD3OnlineEintragungByVorgangsnummer($this->vorgangsnummer);
@@ -158,5 +246,10 @@ class Vorgang extends Model
     public function getD3Betriebsakte()
     {
         return app(d3Service::class)->getD3BetriebsakteByBetriebsnr($this->betriebsnr);
+    }
+
+    public function dokumente(): HasMany
+    {
+        return $this->hasMany(Dokument::class);
     }
 }

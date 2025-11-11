@@ -4,7 +4,12 @@ use Flux\Flux;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Support\Facades\Auth;
-use function Livewire\Volt\{state, title, computed, mount, usesPagination};
+
+use function Livewire\Volt\computed;
+use function Livewire\Volt\mount;
+use function Livewire\Volt\state;
+use function Livewire\Volt\title;
+use function Livewire\Volt\usesPagination;
 
 usesPagination();
 
@@ -23,7 +28,7 @@ mount(function () {
     // Lade den Default-Filter aus den User-Settings
     $user = Auth::user();
     $hwroSettings = $user->settings->app->hwro;
-    
+
     if ($hwroSettings && isset($hwroSettings->defaultVorgaengeFilter)) {
         $this->filter = $hwroSettings->defaultVorgaengeFilter->value;
     }
@@ -31,13 +36,13 @@ mount(function () {
 
 $vorgaenge = computed(function () {
     return Vorgang::query()
-        ->when($this->filter === 'mit_betrieb', fn($query) => $query->whereNotNull('betriebsnr'))
-        ->when($this->filter === 'ohne_betrieb', fn($query) => $query->whereNull('betriebsnr'))
-        ->when($this->search, fn($query) => $query->where(function ($q) {
+        ->when($this->filter === 'mit_betrieb', fn ($query) => $query->whereNotNull('betriebsnr'))
+        ->when($this->filter === 'ohne_betrieb', fn ($query) => $query->whereNull('betriebsnr'))
+        ->when($this->search, fn ($query) => $query->where(function ($q) {
             $q->where('vorgangsnummer', 'like', "%{$this->search}%")
-              ->orWhere('betriebsnr', 'like', "%{$this->search}%");
+                ->orWhere('betriebsnr', 'like', "%{$this->search}%");
         }))
-        ->when($this->sortBy, fn($query) => $query->orderBy($this->sortBy, $this->sortDirection))
+        ->when($this->sortBy, fn ($query) => $query->orderBy($this->sortBy, $this->sortDirection))
         ->paginate(15);
 });
 
@@ -57,21 +62,21 @@ $sort = function (string $column) {
 $alleBetriebenrPruefen = function () {
     $this->gefundeneZuordnungen = [];
     $bueService = app(BueLaravel::class);
-    
+
     // Hole alle aktuell angezeigten Vorgänge ohne Betriebsnummer
     $vorgaengeOhneBetriebsnr = Vorgang::query()
-        ->when($this->filter === 'mit_betrieb', fn($query) => $query->whereNotNull('betriebsnr'))
-        ->when($this->filter === 'ohne_betrieb', fn($query) => $query->whereNull('betriebsnr'))
-        ->when($this->search, fn($query) => $query->where(function ($q) {
+        ->when($this->filter === 'mit_betrieb', fn ($query) => $query->whereNotNull('betriebsnr'))
+        ->when($this->filter === 'ohne_betrieb', fn ($query) => $query->whereNull('betriebsnr'))
+        ->when($this->search, fn ($query) => $query->where(function ($q) {
             $q->where('vorgangsnummer', 'like', "%{$this->search}%")
-              ->orWhere('betriebsnr', 'like', "%{$this->search}%");
+                ->orWhere('betriebsnr', 'like', "%{$this->search}%");
         }))
         ->whereNull('betriebsnr')
         ->get();
-    
+
     foreach ($vorgaengeOhneBetriebsnr as $vorgang) {
         $betriebsnr = $bueService->getBetriebsnrByVorgangsnummer($vorgang->vorgangsnummer);
-        
+
         if ($betriebsnr) {
             $this->gefundeneZuordnungen[] = [
                 'vorgang_id' => $vorgang->id,
@@ -80,9 +85,9 @@ $alleBetriebenrPruefen = function () {
             ];
         }
     }
-    
+
     $this->showResultModal = true;
-    
+
     if (empty($this->gefundeneZuordnungen)) {
         Flux::toast(text: 'Keine neuen Betriebsnummern gefunden', variant: 'info');
     }
@@ -90,7 +95,7 @@ $alleBetriebenrPruefen = function () {
 
 $speichernZuordnungen = function () {
     $anzahl = 0;
-    
+
     foreach ($this->gefundeneZuordnungen as $zuordnung) {
         $vorgang = Vorgang::find($zuordnung['vorgang_id']);
         if ($vorgang) {
@@ -98,16 +103,23 @@ $speichernZuordnungen = function () {
             $anzahl++;
         }
     }
-    
+
     $this->gefundeneZuordnungen = [];
     $this->showResultModal = false;
-    
+
     Flux::toast(text: "{$anzahl} Betriebsnummer(n) erfolgreich gespeichert!", variant: 'success');
 };
 
 $abbrechenZuordnungen = function () {
     $this->gefundeneZuordnungen = [];
     $this->showResultModal = false;
+};
+
+$delete = function (int $vorgangId) {
+    $vorgang = Vorgang::findOrFail($vorgangId);
+    $vorgang->delete();
+
+    Flux::toast(text: 'Vorgang erfolgreich gelöscht!', variant: 'success');
 };
 
 ?>
@@ -214,16 +226,13 @@ $abbrechenZuordnungen = function () {
                                         icon="eye"
                                         :href="route('apps.hwro.vorgaenge.show', $vorgang)"
                                         wire:navigate
-                                    />
-                                    <flux:button 
-                                        size="sm" 
-                                        variant="ghost" 
-                                        icon="pencil"
-                                    />
+                                    />                                    
                                     <flux:button 
                                         size="sm" 
                                         variant="ghost" 
                                         icon="trash"
+                                        wire:confirm="Wollen Sie diesen Vorgang wirklich löschen?"
+                                        wire:click="delete({{ $vorgang->id }})"
                                     />
                                 </div>
                             </flux:table.cell>
