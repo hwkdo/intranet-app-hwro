@@ -21,6 +21,9 @@ Route::middleware(['web', 'auth', 'can:see-app-hwro'])->group(function () {
     // Dokument Download
     Route::get('apps/hwro/dokumente/{dokument}/download', [DokumentController::class, 'download'])->name('apps.hwro.dokumente.download');
 
+    // GEWAN-XML Download
+    Route::get('apps/hwro/vorgaenge/{vorgang}/download-gewan', [DokumentController::class, 'downloadGewan'])->name('apps.hwro.vorgaenge.download-gewan');
+
     // Settings
     Volt::route('apps/hwro/settings/user', 'apps.hwro.settings.user')->name('apps.hwro.settings.user');
 });

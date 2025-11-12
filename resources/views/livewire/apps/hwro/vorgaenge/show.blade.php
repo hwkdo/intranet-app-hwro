@@ -247,10 +247,9 @@ $uebertragenAusLokalenDokumenten = function () {
                                     size="sm" 
                                     variant="primary"
                                     icon="arrow-down-tray"
-                                    href="{{ $gewanMedia->getUrl() }}"
-                                    download="{{ $gewanMedia->file_name }}"
+                                    href="{{ route('apps.hwro.vorgaenge.download-gewan', $vorgang) }}"
                                 >
-                                    {{ $gewanMedia->file_name }}
+                                    {{ $gewanMedia->file_name }} 
                                 </flux:button>
                             </div>
                         @else
