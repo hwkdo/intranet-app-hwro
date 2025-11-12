@@ -23,7 +23,11 @@ class DokumentController
 
         // Download der Datei
         return response()->streamDownload(function () use ($media) {
-            echo $media->stream();
+            $stream = $media->stream();
+            fpassthru($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
         }, $media->file_name, [
             'Content-Type' => $media->mime_type,
         ]);
