@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
+use Illuminate\Support\Facades\Log;
 
 Route::middleware(['auth:sanctum','can:manage-app-hwro'])
 ->prefix('api')
@@ -22,32 +23,33 @@ Route::middleware(['auth:sanctum','can:manage-app-hwro'])
         return response()->json($vorgang, 201);
     })->name('api.apps.hwro.store');
 
-    Route::post('apps/hwro/vorgang/{vorgang:vorgangsnummer}/gewan', function (Request $request, Vorgang $vorgang) {
-        
+    Route::post('apps/hwro/vorgang/{vorgangsnummer}/gewan', function (Request $request, string $vorgangsnummer) {
+        $validated = $request->validate([
+            'file' => 'required|file',
+        ]);
 
-        // Erstelle temporäre XML-Datei aus dem String
-        $tempPath = tempnam(sys_get_temp_dir(), 'gewan_');
-        $xmlFilename = 'gewan_' . $vorgang->vorgangsnummer . '_' . now()->format('Y-m-d_H-i-s') . '.xml';
-        file_put_contents($tempPath, $request->getContent());
 
         try {
             // Füge die XML-Datei zur "gewan" Collection hinzu
-            $vorgang->addMedia($tempPath)
-                ->usingFileName($xmlFilename)
+            $vorgang = Vorgang::firstWhere('vorgangsnummer', $vorgangsnummer);
+            $vorgang->clearMediaCollection('default');
+            if (!$vorgang) {
+                return response()->json([
+                    'message' => 'Vorgang nicht gefunden',
+                ], 404);
+            }
+            
+            $result = $vorgang->addMedia($validated['file'])
+                ->usingFileName($validated['file']->getClientOriginalName())
                 ->toMediaCollection('default');
 
-            // Lösche die temporäre Datei
-            @unlink($tempPath);
 
             return response()->json([
                 'message' => 'GEWAN-Datei erfolgreich gespeichert',
-                #'vorgang' => $vorgang,
-                #'media' => $vorgang->getFirstMedia('default'),
             ], 200);
         } catch (\Exception $e) {
-            // Lösche die temporäre Datei im Fehlerfall
-            @unlink($tempPath);
-            
+            report($e);
+            Log::error('api.apps.hwro.vorgang.gewan.store', ['error' => $e->getMessage()]);
             return response()->json([
                 'message' => 'Fehler beim Speichern der GEWAN-Datei: ' . $e->getMessage(),
             ], 500);
