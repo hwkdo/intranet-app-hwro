@@ -23,14 +23,12 @@ Route::middleware(['auth:sanctum','can:manage-app-hwro'])
     })->name('api.apps.hwro.store');
 
     Route::post('apps/hwro/vorgang/{vorgang:vorgangsnummer}/gewan', function (Request $request, Vorgang $vorgang) {
-        $validated = $request->validate([
-            'gewan' => 'required|string',
-        ]);
+        
 
         // Erstelle temporäre XML-Datei aus dem String
         $tempPath = tempnam(sys_get_temp_dir(), 'gewan_');
         $xmlFilename = 'gewan_' . $vorgang->vorgangsnummer . '_' . now()->format('Y-m-d_H-i-s') . '.xml';
-        file_put_contents($tempPath, $validated['gewan']);
+        file_put_contents($tempPath, $request->getBody()->getContents());
 
         try {
             // Füge die XML-Datei zur "gewan" Collection hinzu
