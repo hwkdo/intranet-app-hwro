@@ -101,7 +101,7 @@ $abbrechenBetriebsnr = function () {
 
 $oeffneSchlagwortModal = function ($dokumentId) {
     $dokument = \Hwkdo\IntranetAppHwro\Models\Dokument::find($dokumentId);
-    
+
     if ($dokument) {
         $this->editingDokument = $dokument;
         $this->selectedSchlagwortId = $dokument->schlagwort_id;
@@ -112,14 +112,14 @@ $oeffneSchlagwortModal = function ($dokumentId) {
 $speichernSchlagwort = function () {
     if ($this->editingDokument && $this->selectedSchlagwortId) {
         $this->editingDokument->update(['schlagwort_id' => $this->selectedSchlagwortId]);
-        
+
         // Invalidiere das computed property
         unset($this->lokaleDokumente);
-        
+
         $this->editingDokument = null;
         $this->selectedSchlagwortId = null;
         $this->showSchlagwortModal = false;
-        
+
         Flux::toast(text: 'Schlagwort erfolgreich aktualisiert!', variant: 'success');
     }
 };
@@ -132,18 +132,18 @@ $abbrechenSchlagwort = function () {
 
 $uebertragenAusOnlineEintragung = function () {
     $result = $this->vorgang->makeD3Betriebsakte();
-    
+
     if ($result && $result['success']) {
         // Invalidiere das computed property, damit es beim nächsten Zugriff neu geladen wird
         unset($this->betriebsakteDokumente);
-        
+
         Flux::toast(
             text: 'Dokumente erfolgreich in die Betriebsakte übertragen!',
             variant: 'success'
         );
     } elseif ($result) {
         Flux::toast(
-            text: 'Fehler beim Übertragen: ' . ($result['message'] ?? 'Unbekannter Fehler'),
+            text: 'Fehler beim Übertragen: '.($result['message'] ?? 'Unbekannter Fehler'),
             variant: 'danger'
         );
     } else {
@@ -156,17 +156,17 @@ $uebertragenAusOnlineEintragung = function () {
 
 $uebertragenAusLokalenDokumenten = function () {
     $result = $this->vorgang->makeD3BetriebsakteFromLocal();
-    
+
     if ($result && $result['success']) {
         unset($this->betriebsakteDokumente);
-        
+
         Flux::toast(
             text: 'Lokale Dokumente erfolgreich in die Betriebsakte übertragen!',
             variant: 'success'
         );
     } elseif ($result) {
         Flux::toast(
-            text: 'Fehler beim Übertragen: ' . ($result['message'] ?? 'Unbekannter Fehler'),
+            text: 'Fehler beim Übertragen: '.($result['message'] ?? 'Unbekannter Fehler'),
             variant: 'danger'
         );
     } else {
@@ -234,6 +234,28 @@ $uebertragenAusLokalenDokumenten = function () {
                     <div>
                         <flux:label>Aktualisiert am</flux:label>
                         <flux:text class="mt-1">{{ $vorgang->updated_at?->format('d.m.Y H:i') ?? '-' }}</flux:text>
+                    </div>
+                    
+                    <div>
+                        <flux:label>GEWAN-XML</flux:label>
+                        @if($vorgang->hasMedia())
+                            @php
+                                $gewanMedia = $vorgang->getFirstMedia();
+                            @endphp
+                            <div class="mt-1">
+                                <flux:button 
+                                    size="sm" 
+                                    variant="primary"
+                                    icon="arrow-down-tray"
+                                    href="{{ $gewanMedia->getUrl() }}"
+                                    download="{{ $gewanMedia->file_name }}"
+                                >
+                                    {{ $gewanMedia->file_name }}
+                                </flux:button>
+                            </div>
+                        @else
+                            <flux:text class="mt-1 text-zinc-500 dark:text-zinc-400">Keine</flux:text>
+                        @endif
                     </div>
                 </div>
             </flux:card>
