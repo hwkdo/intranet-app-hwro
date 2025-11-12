@@ -28,13 +28,13 @@ Route::middleware(['auth:sanctum','can:manage-app-hwro'])
         // Erstelle temporäre XML-Datei aus dem String
         $tempPath = tempnam(sys_get_temp_dir(), 'gewan_');
         $xmlFilename = 'gewan_' . $vorgang->vorgangsnummer . '_' . now()->format('Y-m-d_H-i-s') . '.xml';
-        file_put_contents($tempPath, $request->getBody()->getContents());
+        file_put_contents($tempPath, $request->getContent());
 
         try {
             // Füge die XML-Datei zur "gewan" Collection hinzu
             $vorgang->addMedia($tempPath)
                 ->usingFileName($xmlFilename)
-                ->toMediaCollection('gewan');
+                ->toMediaCollection('default');
 
             // Lösche die temporäre Datei
             @unlink($tempPath);
@@ -42,7 +42,7 @@ Route::middleware(['auth:sanctum','can:manage-app-hwro'])
             return response()->json([
                 'message' => 'GEWAN-Datei erfolgreich gespeichert',
                 'vorgang' => $vorgang,
-                'media' => $vorgang->getFirstMedia('gewan'),
+                'media' => $vorgang->getFirstMedia('default'),
             ], 200);
         } catch (\Exception $e) {
             // Lösche die temporäre Datei im Fehlerfall

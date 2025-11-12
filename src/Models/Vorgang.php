@@ -33,7 +33,7 @@ class Vorgang extends Model implements HasMedia
             }
             
             // Lösche auch die GEWAN-Media-Datei
-            $vorgang->clearMediaCollection('gewan');
+            $vorgang->clearMediaCollection('default');
         });
     }
 
@@ -47,7 +47,7 @@ class Vorgang extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('gewan')
+        $this->addMediaCollection('default')
             ->singleFile()
             ->useDisk('intranet-app-hwro');
     }
