@@ -41,8 +41,8 @@ Route::middleware(['auth:sanctum','can:manage-app-hwro'])
 
             return response()->json([
                 'message' => 'GEWAN-Datei erfolgreich gespeichert',
-                'vorgang' => $vorgang,
-                'media' => $vorgang->getFirstMedia('default'),
+                #'vorgang' => $vorgang,
+                #'media' => $vorgang->getFirstMedia('default'),
             ], 200);
         } catch (\Exception $e) {
             // Lösche die temporäre Datei im Fehlerfall
