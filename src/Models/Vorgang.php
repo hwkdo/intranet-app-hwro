@@ -5,6 +5,7 @@ namespace Hwkdo\IntranetAppHwro\Models;
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\D3RestLaravel\Client as D3Client;
 use Hwkdo\IntranetAppHwro\Services\d3Service;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,7 +19,7 @@ class Vorgang extends Model implements HasMedia
     
     protected $table = 'intranet_app_hwro_vorgangs';
 
-    protected $fillable = ['vorgangsnummer', 'betriebsnr'];
+    protected $fillable = ['vorgangsnummer', 'betriebsnr', 'betriebsakte_created_at'];
 
     protected static function booted(): void
     {
@@ -42,6 +43,7 @@ class Vorgang extends Model implements HasMedia
         return [
             'vorgangsnummer' => 'integer',
             'betriebsnr' => 'integer',
+            'betriebsakte_created_at' => 'datetime',
         ];
     }
 
@@ -156,6 +158,10 @@ class Vorgang extends Model implements HasMedia
                 }
             }
 
+            $this->update([
+                'betriebsakte_created_at' => now(),
+            ]);
+
             return [
                 'success' => $result->success,
                 'message' => $result->message,
@@ -235,6 +241,10 @@ class Vorgang extends Model implements HasMedia
 
         // Rückgabe der Ergebnisse
         if ($uploadedCount > 0) {
+            $this->update([
+                'betriebsakte_created_at' => now(),
+            ]);
+
             return [
                 'success' => true,
                 'message' => $uploadedCount.' Dokument(e) erfolgreich übertragen',
@@ -250,6 +260,39 @@ class Vorgang extends Model implements HasMedia
         }
 
         return null;
+    }
+
+    protected function hasBetriebsakte(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->betriebsakte_created_at ? true : false,
+        );
+    }
+
+    protected function canMakeBetriebsakte(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                // 1. hasBetriebsakte muss false sein
+                if ($this->hasBetriebsakte) {
+                    return false;
+                }
+                
+                // 2. dokumente()->count() muss größer als 0 sein
+                if ($this->dokumente()->count() === 0) {
+                    return false;
+                }
+                
+                // 3. Es muss mindestens 1 Dokument mit Schlagwort "Antrag auf Eintragung" existieren
+                $hasAntragAufEintragung = $this->dokumente()
+                    ->whereHas('schlagwort', function ($query) {
+                        $query->where('schlagwort', 'Antrag auf Eintragung');
+                    })
+                    ->exists();
+                
+                return $hasAntragAufEintragung;
+            },
+        );
     }
 
     public function getD3OnlineEintragung()

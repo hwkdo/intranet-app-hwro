@@ -88,6 +88,16 @@ on([
         ]);
         $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
     },
+    'echo:intranet-app-hwro-scheduler,.betriebsakte.created' => function ($event) {
+        array_unshift($this->schedulerEvents, [
+            'id' => uniqid().'-'.mt_rand(),
+            'type' => 'Betriebsakte erstellt',
+            'message' => $event['msg'] ?? '',
+            'variant' => 'success',
+            'timestamp' => now()->format('d.m.Y H:i:s'),
+        ]);
+        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
+    },
 ]);
 
 $clearSchedulerEvents = function () {
