@@ -42,7 +42,14 @@ $vorgaenge = computed(function () {
             $q->where('vorgangsnummer', 'like', "%{$this->search}%")
                 ->orWhere('betriebsnr', 'like', "%{$this->search}%");
         }))
-        ->when($this->sortBy, fn ($query) => $query->orderBy($this->sortBy, $this->sortDirection))
+        ->when($this->sortBy, function ($query) {
+            // Bei created_at explizit nach Timestamp sortieren, nicht nach formatiertem String
+            if ($this->sortBy === 'created_at') {
+                $query->orderBy('created_at', $this->sortDirection);
+            } else {
+                $query->orderBy($this->sortBy, $this->sortDirection);
+            }
+        })
         ->paginate(15);
 });
 
