@@ -4,11 +4,13 @@ namespace Hwkdo\IntranetAppHwro\Models;
 
 use Hwkdo\BueLaravel\BueLaravel;
 use Hwkdo\D3RestLaravel\Client as D3Client;
+use Hwkdo\IntranetAppFormwerk\Models\TypHasWebhook;
 use Hwkdo\IntranetAppHwro\Services\d3Service;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -308,5 +310,10 @@ class Vorgang extends Model implements HasMedia
     public function dokumente(): HasMany
     {
         return $this->hasMany(Dokument::class);
+    }
+
+    public function typHasWebhook(): HasOne
+    {
+        return $this->hasOne(TypHasWebhook::class, 'identifier', 'vorgangsnummer');
     }
 }
