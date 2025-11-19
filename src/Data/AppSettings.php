@@ -13,6 +13,12 @@ class AppSettings extends BaseAppSettings
         
         #[Description('Aktiviert die automatische Erstellung von Betriebsakten')]
         public bool $scheduleMakeBetriebsakte = true,
+
+        #[Description('Aktiviert die automatische Löschung von Vorgängen nach einem bestimmten Zeitraum')]
+        public bool $scheduleDeleteVorgaenge = true,
+
+        #[Description('Automatische Löschung von Vorgängen nach X Wochen')]
+        public int $scheduleDeleteVorgaengeAfterWeeks = 12,
         
         #[Description('Intervall in Minuten für die Suche nach Betriebsnummern (Standard: 15 Minuten)')]
         public int $scheduleSearchBetriebsnrIntervalMinutes = 15,

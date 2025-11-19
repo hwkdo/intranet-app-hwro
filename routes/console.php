@@ -16,4 +16,9 @@ if (! app()->runningUnitTests()) {
         Schedule::command('intranet-app-hwro:make-betriebsakte')
             ->cron("*/{$settings->scheduleMakeBetriebsakteIntervalMinutes} * * * *");
     }
+
+    if ($settings?->scheduleDeleteVorgaenge) {
+        Schedule::command('intranet-app-hwro:clean-vorgaenge')
+        ->dailyAt('00:01');            
+    }
 }
