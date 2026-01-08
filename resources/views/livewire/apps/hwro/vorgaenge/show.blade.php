@@ -357,7 +357,15 @@ $uebertragenAusLokalenDokumenten = function () {
                 <div class="grid gap-6 md:grid-cols-2">
                     <flux:card>
                         <flux:heading size="lg" class="mb-4">D3 Dokumente Betriebsakte</flux:heading>
-                        
+                        @if(!$this->lokaleDokumente->isEmpty())
+                                    <flux:button 
+                                        variant="primary"
+                                        icon="arrow-path"
+                                        wire:click="uebertragenAusLokalenDokumenten"
+                                    >
+                                        Übertragen aus Lokalen Dokumenten
+                                    </flux:button>
+                                @endif
                         @if($this->betriebsakteDokumente->isEmpty())
                             <div class="space-y-4">
                                 <flux:text class="text-zinc-500 dark:text-zinc-400">
@@ -373,15 +381,7 @@ $uebertragenAusLokalenDokumenten = function () {
                                         Übertragen aus Online Eintragung
                                     </flux:button>
                                 @endif
-                                @if(!$this->lokaleDokumente->isEmpty())
-                                    <flux:button 
-                                        variant="primary"
-                                        icon="arrow-path"
-                                        wire:click="uebertragenAusLokalenDokumenten"
-                                    >
-                                        Übertragen aus Lokalen Dokumenten
-                                    </flux:button>
-                                @endif
+                                
                             </div>
                         @else
                             <div class="space-y-3">
