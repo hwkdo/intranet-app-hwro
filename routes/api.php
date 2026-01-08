@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Support\Facades\Log;
 
-Route::middleware(['auth:sanctum','can:manage-app-hwro'])
+Route::middleware(['auth:api', 'can:manage-app-hwro'])
 ->prefix('api')
 ->group(function () {  
 
