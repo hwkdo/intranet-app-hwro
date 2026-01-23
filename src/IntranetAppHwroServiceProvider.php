@@ -38,6 +38,7 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/console.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/ai.php');
     }
 
     public function register(): void

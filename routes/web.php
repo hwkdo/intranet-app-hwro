@@ -26,6 +26,9 @@ Route::middleware(['web', 'auth', 'can:see-app-hwro'])->group(function () {
 
     // Settings
     Volt::route('apps/hwro/settings/user', 'apps.hwro.settings.user')->name('apps.hwro.settings.user');
+
+    // Chat
+    Volt::route('apps/hwro/chat', 'apps.hwro.chat')->name('apps.hwro.chat');
 });
 
 Route::middleware(['web','auth','can:manage-app-hwro'])->group(function () {

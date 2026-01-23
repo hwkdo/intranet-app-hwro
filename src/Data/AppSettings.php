@@ -28,6 +28,9 @@ class AppSettings extends BaseAppSettings
 
         #[Description('Das Standard-Schlagwort für die Erstellung von Betriebsakten, wenn kein Filename passend ist')]
         public string $defaultSchlagwort = 'Antrag auf Eintragung',
+
+        #[Description('OpenWebUi-Modell für KI Chat')]
+        public string $openWebUiModel = 'intranet-app-hwro',
     ) {}
 
 }
