@@ -26,20 +26,21 @@ class VorgaengeAnzeigenTool extends Tool
      */
     public function handle(Request $request): Response
     {
+        
         $query = Vorgang::query();
 
         // Filter nach Vorgangsnummer
-        if ($request->has('vorgangsnummer')) {
+        if ($request->has('vorgangsnummer') && $request->get('vorgangsnummer') !== null) {
             $query->where('vorgangsnummer', $request->get('vorgangsnummer'));
         }
 
         // Filter nach Betriebsnummer
-        if ($request->has('betriebsnr')) {
+        if ($request->has('betriebsnr') && $request->get('betriebsnr') !== null) {
             $query->where('betriebsnr', $request->get('betriebsnr'));
         }
 
         // Filter nach Betriebsakte erstellt
-        if ($request->has('betriebsakte_erstellt')) {
+        if ($request->has('betriebsakte_erstellt') && $request->get('betriebsakte_erstellt') !== null) {
             $betriebsakteErstellt = $request->get('betriebsakte_erstellt');
             if ($betriebsakteErstellt === true) {
                 $query->whereNotNull('betriebsakte_created_at');
