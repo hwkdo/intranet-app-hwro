@@ -43,4 +43,14 @@ class IntranetAppHwro implements IntranetAppInterface
     {
         return AppSettings::class;
     }
+
+    public static function mcpServers(): array
+    {
+        return [
+            'hwro' => [
+                'class' => \Hwkdo\IntranetAppHwro\Mcp\Servers\HwroServer::class,
+                'middleware' => ['auth:api'],
+            ],
+        ];
+    }
 }
