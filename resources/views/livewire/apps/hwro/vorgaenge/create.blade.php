@@ -43,7 +43,7 @@ $save = function () {
         <x-slot:heading>Neuer Vorgang</x-slot:heading>
         <x-slot:subheading>Erstellen Sie einen neuen Vorgang</x-slot:subheading>
 
-        <flux:card>
+        <flux:card class="glass-card">
             <flux:heading size="lg" class="mb-6">Neuer Vorgang</flux:heading>
             
             <form wire:submit="save" class="space-y-6">

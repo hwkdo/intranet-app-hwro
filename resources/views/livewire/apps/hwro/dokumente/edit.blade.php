@@ -80,6 +80,7 @@ $cancel = function () {
 <div>
 <x-intranet-app-hwro::hwro-layout heading="Dokument bearbeiten" subheading="Bearbeiten Sie die Dokument-Details">
 
+    <flux:card class="glass-card">
     <form wire:submit="save" class="space-y-6">
         <flux:field>
             <flux:label>Vorgang</flux:label>
@@ -105,7 +106,7 @@ $cancel = function () {
             <flux:label>Datei ersetzen (optional)</flux:label>
             
             @if($dokument->hasMedia())
-                <div class="mb-2 p-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+                <div class="mb-2 p-3 bg-[#d0e3f9]/30 dark:bg-[#073070]/30 rounded-lg border border-[#d0e3f9]/60 dark:border-white/10">
                     <flux:text class="text-sm">
                         Aktuelle Datei: {{ $dokument->getFirstMedia()->file_name }}
                     </flux:text>
@@ -115,17 +116,17 @@ $cancel = function () {
             <input 
                 type="file" 
                 wire:model="datei" 
-                class="block w-full text-sm text-zinc-900 border border-zinc-300 rounded-lg cursor-pointer bg-zinc-50 dark:text-zinc-400 focus:outline-none dark:bg-zinc-700 dark:border-zinc-600 dark:placeholder-zinc-400"
+                class="block w-full text-sm text-slate-800 border border-[#d0e3f9] rounded-lg cursor-pointer bg-white/60 dark:text-white/70 focus:outline-none dark:bg-[#073070]/40 dark:border-white/20"
             />
             <flux:error name="datei" />
             
             @if ($datei)
-                <div class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+                <div class="mt-2 text-sm text-[#073070]/70 dark:text-white/60">
                     Neue Datei: {{ $datei->getClientOriginalName() }}
                 </div>
             @endif
             
-            <div wire:loading wire:target="datei" class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            <div wire:loading wire:target="datei" class="mt-2 text-sm text-[#073070]/70 dark:text-white/60">
                 Datei wird hochgeladen...
             </div>
         </flux:field>
@@ -139,6 +140,7 @@ $cancel = function () {
             </flux:button>
         </div>
     </form>
+    </flux:card>
 
 </x-intranet-app-hwro::hwro-layout>
 </div>

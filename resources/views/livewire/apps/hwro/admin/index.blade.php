@@ -238,7 +238,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
 
             <flux:tab.panel name="scheduler">
                 <div style="min-height: 400px;">
-                    <flux:card>
+                    <flux:card class="glass-card">
                         <div class="mb-4 flex items-center justify-between">
                             <flux:heading size="lg">Scheduler Events</flux:heading>
                             <div class="flex gap-2">
@@ -259,7 +259,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                         </flux:text>
 
                         <div class="mb-6 flex items-center gap-4">
-                            <flux:text class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                            <flux:text class="text-sm font-medium text-[#073070]/80 dark:text-white/70">
                                 Scheduler manuell ausführen:
                             </flux:text>
                             <div class="flex gap-2">
@@ -285,7 +285,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
 
                         <div class="space-y-2" wire:poll.visible>
                             @if(count($schedulerEvents) === 0)
-                                <div class="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center">
+                                <div class="rounded-lg border border-dashed border-[#d0e3f9] dark:border-white/20 p-8 text-center">
                                     <flux:text>
                                         Keine Events empfangen. Warten auf Scheduler-Aktivität...
                                     </flux:text>
@@ -293,18 +293,18 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                             @else
                                 @foreach($schedulerEvents as $event)
                                     <div 
-                                        class="rounded-lg border p-4 @if($event['variant'] === 'info') border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30 @elseif($event['variant'] === 'success') border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 @elseif($event['variant'] === 'warning') border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30 @else border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50 @endif"
+                                        class="rounded-lg border p-4 @if($event['variant'] === 'info') border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30 @elseif($event['variant'] === 'success') border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 @elseif($event['variant'] === 'warning') border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30 @else border-[#d0e3f9]/70 bg-white/50 dark:border-white/15 dark:bg-[#04214e]/40 @endif"
                                         wire:key="event-{{ $event['id'] }}"
                                     >
                                         <div class="flex items-start justify-between gap-4">
                                             <div class="flex-1 min-w-0">
                                                 <div class="flex items-center gap-2 mb-1">
-                                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium @if($event['variant'] === 'info') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @elseif($event['variant'] === 'success') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 @elseif($event['variant'] === 'warning') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @else bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200 @endif">
+                                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium @if($event['variant'] === 'info') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @elseif($event['variant'] === 'success') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 @elseif($event['variant'] === 'warning') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @else bg-[#d0e3f9]/60 text-[#073070] dark:bg-[#04214e]/60 dark:text-white/80 @endif">
                                                         {{ $event['type'] }}
                                                     </span>
-                                                    <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ $event['timestamp'] }}</span>
+                                                    <span class="text-xs text-[#073070]/60 dark:text-white/50">{{ $event['timestamp'] }}</span>
                                                 </div>
-                                                <p class="text-sm text-zinc-900 dark:text-zinc-100 break-words">{{ $event['message'] }}</p>
+                                                <p class="text-sm text-slate-800 dark:text-white/90 break-words">{{ $event['message'] }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -317,7 +317,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
 
             <flux:tab.panel name="schlagwoerter">
                 <div style="min-height: 400px;">
-                    <flux:card>
+                    <flux:card class="glass-card">
                         <div class="mb-4 flex items-center justify-between">
                             <flux:heading size="lg">Schlagwörter</flux:heading>
                             <flux:button wire:click="openCreateSchlagwortModal" variant="primary" icon="plus">
@@ -375,7 +375,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                                                     @endforeach
                                                 </div>
                                             @else
-                                                <span class="text-zinc-400 dark:text-zinc-500">Keine</span>
+                                                <span class="text-slate-400 dark:text-white/40">Keine</span>
                                             @endif
                                         </flux:table.cell>
                                         <flux:table.cell>
@@ -433,7 +433,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                                         placeholder="filename1.pdf&#10;filename2.pdf&#10;pattern*.pdf"
                                         rows="5"
                                     />
-                                    <flux:text class="text-sm text-zinc-500 dark:text-zinc-400">
+                                    <flux:text class="text-sm text-slate-500 dark:text-white/50">
                                         Geben Sie Filenames ein, die später für die automatische Zuordnung verwendet werden. Ein Filename pro Zeile.
                                     </flux:text>
                                     <flux:error name="filenamesInput" />

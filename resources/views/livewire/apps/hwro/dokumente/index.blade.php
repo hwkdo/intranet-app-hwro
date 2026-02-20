@@ -46,6 +46,7 @@ $deleteDokument = function (Dokument $dokument) {
 <div>
 <x-intranet-app-hwro::hwro-layout heading="Dokumente" subheading="Verwalten Sie hier alle Dokumente der Handwerksrolle">
 
+        <flux:card class="glass-card">
         <div class="space-y-6">
             <div class="flex items-center justify-between gap-4">
                 <flux:input 
@@ -92,21 +93,21 @@ $deleteDokument = function (Dokument $dokument) {
                                 @if($dokument->schlagwort)
                                     {{ $dokument->schlagwort->schlagwort }}
                                 @else
-                                    <span class="text-zinc-400 dark:text-zinc-500">-</span>
+                                    <span class="text-slate-400 dark:text-white/40">-</span>
                                 @endif
                             </flux:table.cell>
                             <flux:table.cell>
                                 @if($dokument->vorgang)
                                     {{ $dokument->vorgang->vorgangsnummer }}
                                 @else
-                                    <span class="text-zinc-400 dark:text-zinc-500">-</span>
+                                    <span class="text-slate-400 dark:text-white/40">-</span>
                                 @endif
                             </flux:table.cell>
                             <flux:table.cell>
                                 @if($dokument->hasMedia())
                                     {{ $dokument->getFirstMedia()->file_name }}
                                 @else
-                                    <span class="text-zinc-400 dark:text-zinc-500">Keine Datei</span>
+                                    <span class="text-slate-400 dark:text-white/40">Keine Datei</span>
                                 @endif
                             </flux:table.cell>
                             <flux:table.cell>{{ $dokument->created_at?->format('d.m.Y H:i') ?? '-' }}</flux:table.cell>
@@ -140,6 +141,7 @@ $deleteDokument = function (Dokument $dokument) {
                 </flux:table.rows>
             </flux:table>
         </div>
+        </flux:card>
 
 </x-intranet-app-hwro::hwro-layout>
 </div>

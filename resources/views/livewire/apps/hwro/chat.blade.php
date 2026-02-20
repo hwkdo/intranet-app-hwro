@@ -51,7 +51,7 @@ $hasApiKey = computed(function () {
             'useMcpTools' => true, // Temporär deaktiviert zum Testen
         ])
     @else
-        <flux:card>
+        <flux:card class="glass-card">
             <flux:callout variant="warning" class="mb-4">
                 <flux:heading size="sm">API-Token fehlt</flux:heading>
                 <flux:text>

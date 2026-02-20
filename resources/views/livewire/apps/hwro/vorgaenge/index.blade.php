@@ -133,6 +133,7 @@ $delete = function (int $vorgangId) {
 <div>
 <x-intranet-app-hwro::hwro-layout heading="Vorgänge" subheading="Verwalten Sie hier alle Vorgänge der Handwerksrolle">
 
+        <flux:card class="glass-card">
         <div class="space-y-6">
             <div class="flex items-center justify-between gap-4">
                 <flux:input 
@@ -221,7 +222,7 @@ $delete = function (int $vorgangId) {
                                 @if($vorgang->betriebsnr)
                                     {{ $vorgang->betriebsnr }}
                                 @else
-                                    <span class="text-zinc-400 dark:text-zinc-500">-</span>
+                                    <span class="text-slate-400 dark:text-white/40">-</span>
                                 @endif
                             </flux:table.cell>
                             <flux:table.cell>{{ $vorgang->created_at?->format('d.m.Y H:i') ?? '-' }}</flux:table.cell>
@@ -248,8 +249,8 @@ $delete = function (int $vorgangId) {
                 </flux:table.rows>
             </flux:table>
         </div>
+        </flux:card>
 
-       
 </x-intranet-app-hwro::hwro-layout>
 {{-- Modal für gefundene Betriebsnummern --}}
         <flux:modal wire:model="showResultModal" name="betriebsnr-results">

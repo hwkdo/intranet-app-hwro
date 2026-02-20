@@ -126,7 +126,7 @@ $save = function () {
     
     <x-intranet-app-hwro::hwro-layout>
 
-        <flux:card>
+        <flux:card class="glass-card">
             <flux:heading size="lg" class="mb-4">Administrator-Einstellungen</flux:heading>
             <flux:text class="mb-6">
                 Verwalten Sie die globalen Einstellungen für die Handwerksrolle-App.

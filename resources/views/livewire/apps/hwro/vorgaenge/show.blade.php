@@ -190,7 +190,7 @@ $uebertragenAusLokalenDokumenten = function () {
         <x-slot:subheading>Details zum Vorgang {{ $vorgang->vorgangsnummer }}</x-slot:subheading>
 
         <div class="space-y-6">
-            <flux:card>
+            <flux:card class="glass-card">
                 <div class="mb-6 flex items-center justify-between">
                     <flux:heading size="lg">Vorgangsdetails</flux:heading>
                     <flux:button 
@@ -253,17 +253,17 @@ $uebertragenAusLokalenDokumenten = function () {
                                 </flux:button>
                             </div>
                         @else
-                            <flux:text class="mt-1 text-zinc-500 dark:text-zinc-400">Keine</flux:text>
+                            <flux:text class="mt-1 text-slate-500 dark:text-white/50">Keine</flux:text>
                         @endif
                     </div>
                 </div>
             </flux:card>
 
-            <flux:card>
+            <flux:card class="glass-card">
                 <flux:heading size="lg" class="mb-4">Dokumente Lokal</flux:heading>
                 
                 @if($this->lokaleDokumente->isEmpty())
-                    <flux:text class="text-zinc-500 dark:text-zinc-400">
+                    <flux:text class="text-slate-500 dark:text-white/50">
                         Keine lokalen Dokumente gefunden.
                     </flux:text>
                 @else
@@ -273,18 +273,18 @@ $uebertragenAusLokalenDokumenten = function () {
                                 $media = $dokument->getFirstMedia();
                             @endphp
                             @if($media)
-                                <div class="flex items-center justify-between rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                                <div class="flex items-center justify-between rounded-lg border border-[#d0e3f9]/80 dark:border-white/15 bg-white/40 dark:bg-[#073070]/20 p-4">
                                     <div class="flex items-center gap-3">
-                                        <flux:icon name="document" class="size-6 text-zinc-500 dark:text-zinc-400" />
+                                        <flux:icon name="document" class="size-6 text-[#073070]/60 dark:text-white/50" />
                                         <div>
                                             <flux:text class="font-medium">{{ $media->file_name }}</flux:text>
                                             <div class="flex items-center gap-2">
                                                 @if($dokument->schlagwort)
-                                                    <flux:text size="sm" class="text-zinc-500">
+                                                    <flux:text size="sm" class="text-slate-500">
                                                         Schlagwort: {{ $dokument->schlagwort->schlagwort }}
                                                     </flux:text>
                                                 @else
-                                                    <flux:text size="sm" class="text-zinc-500">
+                                                    <flux:text size="sm" class="text-slate-500">
                                                         Kein Schlagwort
                                                     </flux:text>
                                                 @endif
@@ -296,7 +296,7 @@ $uebertragenAusLokalenDokumenten = function () {
                                                 >
                                                 </flux:button>
                                             </div>
-                                            <flux:text size="sm" class="text-zinc-500">
+                                            <flux:text size="sm" class="text-slate-500">
                                                 Erstellt: {{ $dokument->created_at->format('d.m.Y H:i') }}
                                             </flux:text>
                                         </div>
@@ -316,23 +316,23 @@ $uebertragenAusLokalenDokumenten = function () {
                 @endif
             </flux:card>
 
-            <flux:card>
+            <flux:card class="glass-card">
                 <flux:heading size="lg" class="mb-4">D3 Dokumente Online Eintragung</flux:heading>
                 
                 @if($this->dokumente->isEmpty())
-                    <flux:text class="text-zinc-500 dark:text-zinc-400">
+                    <flux:text class="text-slate-500 dark:text-white/50">
                         Keine Dokumente gefunden.
                     </flux:text>
                 @else
                     <div class="space-y-3">
                         @foreach($this->dokumente as $dokument)
-                            <div class="flex items-center justify-between rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                            <div class="flex items-center justify-between rounded-lg border border-[#d0e3f9]/80 dark:border-white/15 bg-white/40 dark:bg-[#073070]/20 p-4">
                                 <div class="flex items-center gap-3">
-                                    <flux:icon name="document" class="size-6 text-zinc-500 dark:text-zinc-400" />
+                                    <flux:icon name="document" class="size-6 text-[#073070]/60 dark:text-white/50" />
                                     <div>
                                         <flux:text class="font-medium">{{ $dokument->filename }}</flux:text>
                                         @if($dokument->datum)
-                                            <flux:text size="sm" class="text-zinc-500">
+                                            <flux:text size="sm" class="text-slate-500">
                                                 Datum: {{ $dokument->datum }}
                                             </flux:text>
                                         @endif
@@ -355,7 +355,7 @@ $uebertragenAusLokalenDokumenten = function () {
 
             @if($vorgang->betriebsnr)
                 <div class="grid gap-6 md:grid-cols-2">
-                    <flux:card>
+                    <flux:card class="glass-card">
                         <flux:heading size="lg" class="mb-4">D3 Dokumente Betriebsakte</flux:heading>
                         @if(!$this->lokaleDokumente->isEmpty())
                                     <flux:button 
@@ -368,7 +368,7 @@ $uebertragenAusLokalenDokumenten = function () {
                                 @endif
                         @if($this->betriebsakteDokumente->isEmpty())
                             <div class="space-y-4">
-                                <flux:text class="text-zinc-500 dark:text-zinc-400">
+                                <flux:text class="text-slate-500 dark:text-white/50">
                                     Keine Dokumente gefunden.
                                 </flux:text>
                                 
@@ -386,18 +386,18 @@ $uebertragenAusLokalenDokumenten = function () {
                         @else
                             <div class="space-y-3">
                                 @foreach($this->betriebsakteDokumente as $dokument)
-                                    <div class="flex items-center justify-between rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+                                    <div class="flex items-center justify-between rounded-lg border border-[#d0e3f9]/80 dark:border-white/15 bg-white/40 dark:bg-[#073070]/20 p-4">
                                         <div class="flex items-center gap-3">
-                                            <flux:icon name="document" class="size-6 text-zinc-500 dark:text-zinc-400" />
+                                            <flux:icon name="document" class="size-6 text-[#073070]/60 dark:text-white/50" />
                                             <div>
                                                 <flux:text class="font-medium">{{ $dokument->filename }}</flux:text>
                                                 @if(isset($dokument->Belegdatum) && $dokument->Belegdatum)
-                                                    <flux:text size="sm" class="text-zinc-500">
+                                                    <flux:text size="sm" class="text-slate-500">
                                                         Belegdatum: {{ $dokument->Belegdatum }}
                                                     </flux:text>
                                                 @endif
                                                 @if(isset($dokument->Schlagwort) && $dokument->Schlagwort)
-                                                    <flux:text size="sm" class="text-zinc-500">
+                                                    <flux:text size="sm" class="text-slate-500">
                                                         Schlagwort: {{ $dokument->Schlagwort }}
                                                     </flux:text>
                                                 @endif
@@ -418,7 +418,7 @@ $uebertragenAusLokalenDokumenten = function () {
                         @endif
                     </flux:card>
 
-                    <flux:card>
+                    <flux:card class="glass-card">
                         <flux:heading size="lg" class="mb-4">BuE Betriebsdaten</flux:heading>
                         
                         @if($this->betriebsdaten)
@@ -439,7 +439,7 @@ $uebertragenAusLokalenDokumenten = function () {
                                 </div>
                             </div>
                         @else
-                            <flux:text class="text-zinc-500 dark:text-zinc-400">
+                            <flux:text class="text-slate-500 dark:text-white/50">
                                 Keine Betriebsdaten gefunden.
                             </flux:text>
                         @endif

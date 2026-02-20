@@ -34,14 +34,14 @@ $downloadFile = function () {
 <x-intranet-app-hwro::hwro-layout heading="Dokument Details" subheading="Ansicht des Dokuments">
 
     <div class="space-y-6">
-        <flux:card>
+        <flux:card class="glass-card">
             <div class="space-y-4">
                 <div>
                     <flux:heading size="sm" class="mb-2">Schlagwort</flux:heading>
                     @if($dokument->schlagwort)
                         <flux:text>{{ $dokument->schlagwort->schlagwort }}</flux:text>
                     @else
-                        <flux:text class="text-zinc-400 dark:text-zinc-500">Kein Schlagwort zugeordnet</flux:text>
+                        <flux:text class="text-slate-400 dark:text-white/40">Kein Schlagwort zugeordnet</flux:text>
                     @endif
                 </div>
 
@@ -57,7 +57,7 @@ $downloadFile = function () {
                             @endif
                         </flux:text>
                     @else
-                        <flux:text class="text-zinc-400 dark:text-zinc-500">Kein Vorgang zugeordnet</flux:text>
+                        <flux:text class="text-slate-400 dark:text-white/40">Kein Vorgang zugeordnet</flux:text>
                     @endif
                 </div>
 
@@ -86,7 +86,7 @@ $downloadFile = function () {
                             </div>
                         </div>
                     @else
-                        <flux:text class="text-zinc-400 dark:text-zinc-500">Keine Datei vorhanden</flux:text>
+                        <flux:text class="text-slate-400 dark:text-white/40">Keine Datei vorhanden</flux:text>
                     @endif
                 </div>
 
