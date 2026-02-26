@@ -3,11 +3,13 @@
 namespace Hwkdo\IntranetAppHwro;
 
 use Hwkdo\IntranetAppBase\Interfaces\IntranetAppInterface;
+use Hwkdo\IntranetAppBase\Interfaces\ProvidesTasksInterface;
 use Hwkdo\IntranetAppHwro\Data\AppSettings;
 use Hwkdo\IntranetAppHwro\Data\UserSettings;
+use Hwkdo\IntranetAppHwro\Tasks\BetriebsakteAusstehendTaskProvider;
 use Illuminate\Support\Collection;
 
-class IntranetAppHwro implements IntranetAppInterface
+class IntranetAppHwro implements IntranetAppInterface, ProvidesTasksInterface
 {
     public static function app_name(): string
     {
@@ -51,6 +53,13 @@ class IntranetAppHwro implements IntranetAppInterface
                 'class' => \Hwkdo\IntranetAppHwro\Mcp\Servers\HwroServer::class,
                 'middleware' => ['auth:api'],
             ],
+        ];
+    }
+
+    public static function taskProviders(): array
+    {
+        return [
+            BetriebsakteAusstehendTaskProvider::class,
         ];
     }
 }
