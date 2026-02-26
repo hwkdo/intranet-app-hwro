@@ -24,7 +24,7 @@
         "hwkdo/intranet-app-base": "dev-main || ^1.0",
         "spatie/laravel-permission": "^6.16",
         "livewire/volt": "^1.6.7",
-        "hwkdo/bue-laravel": "dev-main || ^0.1.2",
+        "hwkdo/bue-laravel": "dev-main || ^0",
         "hwkdo/d3-rest-laravel": "dev-main || ^1.0.12",
         "spatie/laravel-data": "^4.14",
         "hwkdo/pdf-rest-laravel": "dev-main || ^1.0"
