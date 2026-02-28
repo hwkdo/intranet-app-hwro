@@ -221,11 +221,20 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
         {{-- Flux Tabs --}}
         <flux:tab.group>
             <flux:tabs wire:model="activeTab">
+                <flux:tab name="hintergrundbild" icon="photo">Hintergrundbild</flux:tab>
                 <flux:tab name="einstellungen" icon="cog-6-tooth">Einstellungen</flux:tab>
                 <flux:tab name="scheduler" icon="clock">Scheduler</flux:tab>
                 <flux:tab name="schlagwoerter" icon="tag">Schlagwörter</flux:tab>
             </flux:tabs>
-            
+
+        <flux:tab.panel name="hintergrundbild">
+            <div style="min-height: 400px;">
+                @livewire('intranet-app-base::app-background-image', [
+                    'appIdentifier' => 'hwro',
+                ])
+            </div>
+        </flux:tab.panel>
+
         <flux:tab.panel name="einstellungen">
             <div style="min-height: 400px;">
                 @livewire('intranet-app-base::admin-settings', [
