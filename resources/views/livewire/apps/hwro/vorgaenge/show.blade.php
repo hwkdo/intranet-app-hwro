@@ -38,11 +38,15 @@ $alleSchlagworte = computed(function () {
 $dokumente = computed(function () {
     $d3Client = app(Client::class);
 
-    return $d3Client->SearchResult(
-        fulltext: $this->vorgang->vorgangsnummer,
-        doc_type: DocTypeEnum::HandwerksrolleOnline,
-        raw: false
-    );
+    try {
+        return $d3Client->SearchResult(
+            fulltext: $this->vorgang->vorgangsnummer,
+            doc_type: DocTypeEnum::HandwerksrolleOnline,
+            raw: false
+        );
+    } catch (\Throwable $e) {
+        return collect([]);
+    }
 });
 
 $betriebsakteDokumente = computed(function () {
@@ -52,11 +56,15 @@ $betriebsakteDokumente = computed(function () {
 
     $d3Client = app(Client::class);
 
-    return $d3Client->SearchResult(
-        fulltext: $this->vorgang->betriebsnr,
-        doc_type: DocTypeEnum::Handwerksrolle,
-        raw: false
-    );
+    try {
+        return $d3Client->SearchResult(
+            fulltext: $this->vorgang->betriebsnr,
+            doc_type: DocTypeEnum::Handwerksrolle,
+            raw: false
+        );
+    } catch (\Throwable $e) {
+        return collect([]);
+    }
 });
 
 $betriebsdaten = computed(function () {
