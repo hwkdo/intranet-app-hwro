@@ -11,6 +11,7 @@
         ['label' => 'Dokumente', 'href' => route('apps.hwro.dokumente.index'), 'icon' => 'document-text', 'description' => 'Dokumente verwalten', 'buttonText' => 'Dokumente anzeigen'],
         ['label' => 'Chat', 'href' => route('apps.hwro.chat'), 'icon' => 'chat-bubble-left-right', 'description' => 'KI-Chat nutzen', 'buttonText' => 'Chat öffnen'],
         ['label' => 'Meine Einstellungen', 'href' => route('apps.hwro.settings.user'), 'icon' => 'cog-6-tooth', 'description' => 'Persönliche Einstellungen anpassen', 'buttonText' => 'Einstellungen öffnen'],
+        ['label' => 'App-Info', 'href' => route('apps.hwro.info'), 'icon' => 'information-circle', 'description' => 'Installierte Version und Release-Historie', 'buttonText' => 'App-Info anzeigen'],
         ['label' => 'Admin', 'href' => route('apps.hwro.admin.index'), 'icon' => 'shield-check', 'description' => 'Administrationsbereich verwalten', 'buttonText' => 'Admin öffnen', 'permission' => 'manage-app-hwro']
     ];
     
