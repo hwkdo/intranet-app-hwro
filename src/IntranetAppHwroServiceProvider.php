@@ -5,6 +5,7 @@ namespace Hwkdo\IntranetAppHwro;
 use Hwkdo\IntranetAppHwro\Commands\SearchBetriebsnr;
 use Hwkdo\IntranetAppHwro\Commands\MakeBetriebsakte;
 use Hwkdo\IntranetAppHwro\Commands\CleanVorgaenge;
+use Illuminate\Console\Scheduling\Schedule;
 use Livewire\Volt\Volt;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -44,7 +45,9 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
         });
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
-        $this->loadRoutesFrom(__DIR__.'/../routes/console.php');
+        $this->app->resolving(Schedule::class, function (): void {
+            require __DIR__.'/../routes/console.php';
+        });
         $this->loadRoutesFrom(__DIR__.'/../routes/ai.php');
         
         // Merge relay servers config after boot to ensure main config is loaded
