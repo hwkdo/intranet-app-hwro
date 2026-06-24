@@ -23,6 +23,7 @@ state([
     'schlagwortForm' => [
         'schlagwort' => '',
         'filenames' => [],
+        'belegtyp_hr' => null,
     ],
     'filenamesInput' => '',
 ]);
@@ -154,6 +155,7 @@ $openEditSchlagwortModal = function (Schlagwort $schlagwort) {
     $this->schlagwortForm = [
         'schlagwort' => $schlagwort->schlagwort,
         'filenames' => $schlagwort->filenames ?? [],
+        'belegtyp_hr' => $schlagwort->belegtyp_hr,
     ];
     $this->filenamesInput = is_array($schlagwort->filenames) ? implode("\n", $schlagwort->filenames) : '';
     Flux::modal('schlagwort-form')->show();
@@ -162,6 +164,7 @@ $openEditSchlagwortModal = function (Schlagwort $schlagwort) {
 $saveSchlagwort = function () {
     $validated = $this->validate([
         'schlagwortForm.schlagwort' => 'required|string|max:255',
+        'schlagwortForm.belegtyp_hr' => 'nullable|string|max:255',
         'filenamesInput' => 'nullable|string',
     ]);
 
@@ -176,6 +179,7 @@ $saveSchlagwort = function () {
         $schlagwort->update([
             'schlagwort' => $this->schlagwortForm['schlagwort'],
             'filenames' => $filenames,
+            'belegtyp_hr' => $this->schlagwortForm['belegtyp_hr'] ?: null,
         ]);
 
         Flux::toast(
@@ -187,6 +191,7 @@ $saveSchlagwort = function () {
         Schlagwort::create([
             'schlagwort' => $this->schlagwortForm['schlagwort'],
             'filenames' => $filenames,
+            'belegtyp_hr' => $this->schlagwortForm['belegtyp_hr'] ?: null,
         ]);
 
         Flux::toast(
@@ -335,7 +340,7 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                         </div>
                         
                         <flux:text class="mb-6">
-                            Verwalten Sie Schlagwörter für Dokumente. Die Filenames werden später für die automatische Zuordnung verwendet.
+                            Verwalten Sie Schlagwörter für Dokumente. Die Filenames werden für die automatische Zuordnung verwendet. Optional kann pro Schlagwort ein Belegtyp_HR hinterlegt werden — andernfalls gilt der Standard aus den Einstellungen.
                         </flux:text>
 
                         <div class="mb-4">
@@ -358,6 +363,9 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                                 </flux:table.column>
                                 <flux:table.column>
                                     Filenames
+                                </flux:table.column>
+                                <flux:table.column>
+                                    Belegtyp_HR
                                 </flux:table.column>
                                 <flux:table.column>
                                     Dokumente
@@ -385,6 +393,13 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                                                 </div>
                                             @else
                                                 <span class="text-slate-400 dark:text-white/40">Keine</span>
+                                            @endif
+                                        </flux:table.cell>
+                                        <flux:table.cell>
+                                            @if($schlagwort->belegtyp_hr)
+                                                <flux:badge size="sm" variant="outline">{{ $schlagwort->belegtyp_hr }}</flux:badge>
+                                            @else
+                                                <span class="text-slate-400 dark:text-white/40">Standard</span>
                                             @endif
                                         </flux:table.cell>
                                         <flux:table.cell>
@@ -446,6 +461,18 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                                         Geben Sie Filenames ein, die später für die automatische Zuordnung verwendet werden. Ein Filename pro Zeile.
                                     </flux:text>
                                     <flux:error name="filenamesInput" />
+                                </flux:field>
+
+                                <flux:field>
+                                    <flux:label>Belegtyp_HR</flux:label>
+                                    <flux:input
+                                        wire:model="schlagwortForm.belegtyp_hr"
+                                        placeholder="z. B. Handelsregisterverfahren (leer = Standard)"
+                                    />
+                                    <flux:text class="text-sm text-slate-500 dark:text-white/50">
+                                        Optional. Wenn leer, wird der Default Belegtyp_HR aus den Einstellungen verwendet.
+                                    </flux:text>
+                                    <flux:error name="schlagwortForm.belegtyp_hr" />
                                 </flux:field>
                             </div>
 

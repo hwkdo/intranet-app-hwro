@@ -36,7 +36,8 @@ test('AppSettings has correct default values', function () {
     $settings = new AppSettings();
 
     expect($settings->scheduleSearchBetriebsnr)->toBeTrue()
-        ->and($settings->scheduleMakeBetriebsakte)->toBeTrue();
+        ->and($settings->scheduleMakeBetriebsakte)->toBeTrue()
+        ->and($settings->defaultBelegtypHr)->toBe('Eintragungsverfahren');
 });
 
 test('UserSettings has correct default values', function () {

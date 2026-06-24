@@ -228,7 +228,7 @@ class Vorgang extends Model implements HasMedia
                 $result = $d3Service->FormwerkEintragungToD3(
                     $this->betriebsnr,
                     $media->getPath(),
-                    $dokument->schlagwort->schlagwort
+                    $dokument->schlagwort
                 );
 
                 if ($result->success) {

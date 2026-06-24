@@ -14,9 +14,10 @@ class SchlagwortFactory extends Factory
         return [
             'schlagwort' => fake()->word(),
             'filenames' => [
-                fake()->word() . '.pdf',
-                fake()->word() . '.pdf',
+                fake()->word().'.pdf',
+                fake()->word().'.pdf',
             ],
+            'belegtyp_hr' => null,
         ];
     }
 }
