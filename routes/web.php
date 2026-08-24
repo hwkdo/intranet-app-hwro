@@ -12,6 +12,10 @@ Route::middleware(['web', 'auth', 'can:see-app-hwro'])->group(function () {
     Volt::route('apps/hwro/vorgaenge/create', 'apps.hwro.vorgaenge.create')->name('apps.hwro.vorgaenge.create');
     Volt::route('apps/hwro/vorgaenge/{vorgang}', 'apps.hwro.vorgaenge.show')->name('apps.hwro.vorgaenge.show');
 
+    // Betriebsbesuche
+    Volt::route('apps/hwro/betriebsbesuche', 'apps.hwro.betriebsbesuche.index')->name('apps.hwro.betriebsbesuche.index');
+    Volt::route('apps/hwro/betriebsbesuche/{bnr}', 'apps.hwro.betriebsbesuche.show')->name('apps.hwro.betriebsbesuche.show');
+
     // Dokumente
     Volt::route('apps/hwro/dokumente', 'apps.hwro.dokumente.index')->name('apps.hwro.dokumente.index');
     Volt::route('apps/hwro/dokumente/create', 'apps.hwro.dokumente.create')->name('apps.hwro.dokumente.create');
