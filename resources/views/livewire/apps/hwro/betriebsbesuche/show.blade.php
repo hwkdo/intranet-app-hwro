@@ -188,6 +188,7 @@ $betrieb = computed(function (): object {
                             <flux:table.column>Name</flux:table.column>
                             <flux:table.column>Geburtsdatum</flux:table.column>
                             <flux:table.column>Anschrift</flux:table.column>
+                            <flux:table.column>Qualifikation</flux:table.column>
                         </flux:table.columns>
                         <flux:table.rows>
                             @foreach ($this->betrieb->personen as $person)
@@ -202,6 +203,34 @@ $betrieb = computed(function (): object {
                                             $person->strasse ?? null,
                                             trim(implode(' ', array_filter([$person->plz ?? null, $person->ort ?? null]))),
                                         ]))) ?: '—' }}
+                                    </flux:table.cell>
+                                    <flux:table.cell>
+                                        @php
+                                            $qualifikationen = collect($person->qualifikationen ?? []);
+                                        @endphp
+                                        @if ($qualifikationen->isEmpty())
+                                            —
+                                        @else
+                                            <div class="space-y-2">
+                                                @foreach ($qualifikationen as $quali)
+                                                    <div class="space-y-0.5">
+                                                        <div class="font-medium">
+                                                            {{ $quali->gewerbe_bezeichnung ?? $quali->gewerbe ?? '—' }}
+                                                        </div>
+                                                        @if (! empty($quali->eintragungsvoraussetzung))
+                                                            <flux:text class="text-xs text-zinc-600 dark:text-zinc-400">
+                                                                {{ $quali->eintragungsvoraussetzung }}
+                                                            </flux:text>
+                                                        @endif
+                                                        @if (! empty($quali->teiltaetigkeit))
+                                                            <flux:text class="text-xs text-zinc-600 dark:text-zinc-400">
+                                                                Teiltätigkeit: {{ $quali->teiltaetigkeit }}
+                                                            </flux:text>
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
                                     </flux:table.cell>
                                 </flux:table.row>
                             @endforeach
