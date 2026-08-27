@@ -12,16 +12,35 @@ title('Betriebsbesuche - Handwerksrolle Online');
 
 state(['searchQuery' => ''])->url(as: 'q');
 
-$resultCards = computed(function (): Collection {
+$searchTokens = computed(function (): array {
     $query = trim($this->searchQuery);
 
     if ($query === '' || mb_strlen($query) < 2) {
+        return [];
+    }
+
+    $tokens = preg_split('/\s+/u', $query, -1, PREG_SPLIT_NO_EMPTY);
+
+    if ($tokens === false) {
+        return [];
+    }
+
+    return array_values(array_filter(
+        $tokens,
+        fn (string $token): bool => mb_strlen($token) >= 2,
+    ));
+});
+
+$resultCards = computed(function (): Collection {
+    $tokens = $this->searchTokens;
+
+    if ($tokens === []) {
         return collect();
     }
 
-    $betriebe = app(BueLaravel::class)->searchBetriebe($query);
+    $betriebe = app(BueLaravel::class)->searchBetriebe(trim($this->searchQuery));
 
-    return $betriebe->map(function (object $betrieb) use ($query): array {
+    return $betriebe->map(function (object $betrieb) use ($tokens): array {
         $fieldValues = [
             'bnr' => (string) $betrieb->bnr,
             'name' => (string) ($betrieb->name ?? ''),
@@ -47,16 +66,16 @@ $resultCards = computed(function (): Collection {
         $matchedOn = collect($betrieb->matched_on ?? []);
 
         $fieldMatches = collect($labels)
-            ->map(function (string $label, string $field) use ($fieldValues, $query): ?array {
+            ->map(function (string $label, string $field) use ($fieldValues, $tokens): ?array {
                 $value = $fieldValues[$field] ?? '';
 
-                if ($value === '' || ! Str::contains(mb_strtolower($value), mb_strtolower($query))) {
+                if ($value === '' || ! $this->valueContainsAnyToken($value, $tokens)) {
                     return null;
                 }
 
                 return [
                     'label' => $label,
-                    'snippet' => $this->fallbackHighlight($value, $query),
+                    'snippet' => $this->fallbackHighlight($value, $tokens),
                 ];
             })
             ->filter()
@@ -76,11 +95,31 @@ $resultCards = computed(function (): Collection {
     });
 });
 
-$fallbackHighlight = function (string $text, string $query): string {
-    $escapedText = e($text);
-    $escapedQuery = preg_quote($query, '/');
+$valueContainsAnyToken = function (string $value, array $tokens): bool {
+    $haystack = mb_strtolower($value);
 
-    return (string) preg_replace('/('.$escapedQuery.')/iu', '<mark>$1</mark>', $escapedText);
+    foreach ($tokens as $token) {
+        if (Str::contains($haystack, mb_strtolower($token))) {
+            return true;
+        }
+    }
+
+    return false;
+};
+
+$fallbackHighlight = function (string $text, array $tokens): string {
+    $escapedText = e($text);
+
+    if ($tokens === []) {
+        return $escapedText;
+    }
+
+    $pattern = implode('|', array_map(
+        fn (string $token): string => preg_quote($token, '/'),
+        $tokens,
+    ));
+
+    return (string) preg_replace('/('.$pattern.')/iu', '<mark>$1</mark>', $escapedText);
 };
 
 ?>
@@ -92,13 +131,14 @@ $fallbackHighlight = function (string $text, string $query): string {
                 <flux:heading size="lg">Betrieb suchen</flux:heading>
                 <flux:text class="text-zinc-700 dark:text-zinc-200">
                     Suche nach Betriebsnummer, Name, Anschrift oder Personen (Name, Geburtsdatum, Anschrift).
+                    Mehrere Begriffe möglich — jeder Begriff muss irgendwo passen (z. B. „Weidner Dortmund“).
                 </flux:text>
             </div>
 
             <div class="relative">
                 <flux:input
                     wire:model.live.debounce.300ms="searchQuery"
-                    placeholder="Betriebsnummer, Name, Anschrift, Geburtsdatum …"
+                    placeholder="z. B. Weidner Dortmund oder Betriebsnummer …"
                     icon="magnifying-glass"
                     class="w-full"
                 />
@@ -155,7 +195,7 @@ $fallbackHighlight = function (string $text, string $query): string {
                                         <div class="flex items-start justify-between gap-3">
                                             <div class="min-w-0">
                                                 <flux:heading size="sm" class="break-words">
-                                                    {!! $this->fallbackHighlight((string) ($betrieb->name ?? 'Ohne Namen'), trim($searchQuery)) !!}
+                                                    {!! $this->fallbackHighlight((string) ($betrieb->name ?? 'Ohne Namen'), $this->searchTokens) !!}
                                                 </flux:heading>
                                                 <flux:text class="text-sm text-zinc-500">
                                                     BNR {{ $betrieb->bnr }}
@@ -176,7 +216,7 @@ $fallbackHighlight = function (string $text, string $query): string {
 
                                         @if ($betrieb->betriebsanschrift)
                                             <div class="text-sm text-zinc-700 dark:text-zinc-200">
-                                                {!! $this->fallbackHighlight((string) $betrieb->betriebsanschrift, trim($searchQuery)) !!}
+                                                {!! $this->fallbackHighlight((string) $betrieb->betriebsanschrift, $this->searchTokens) !!}
                                             </div>
                                         @endif
 

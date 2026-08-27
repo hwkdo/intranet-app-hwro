@@ -33,7 +33,9 @@ Route::middleware(['web', 'auth', 'can:see-app-hwro'])->group(function () {
     Volt::route('apps/hwro/info', 'apps.hwro.info')->name('apps.hwro.info');
 
     // Chat
-    Volt::route('apps/hwro/chat', 'apps.hwro.chat')->name('apps.hwro.chat');
+    Volt::route('apps/hwro/chat', 'apps.hwro.chat')
+        ->middleware('can:allow_ai_usage')
+        ->name('apps.hwro.chat');
 });
 
 Route::middleware(['web','auth','can:manage-app-hwro'])->group(function () {
