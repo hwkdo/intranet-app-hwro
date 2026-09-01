@@ -13,8 +13,8 @@ class BetriebsakteAusstehendTaskProvider implements TaskProviderInterface
 {
     /**
      * Returns one TaskItem per Vorgang that has a betriebsnr but no betriebsakte yet.
-     * Access is controlled by the TaskService, which only calls this provider for
-     * users who have a role defined in IntranetAppHwro::roles_user() or roles_admin().
+     * Access is controlled by the TaskService via app roles (App-Hwro-Benutzer / App-Hwro-Admin),
+     * not Gate permissions — Super Admins without an HWRO role do not receive these tasks.
      *
      * @return Collection<int, TaskItem>
      */
