@@ -40,7 +40,7 @@ $hasApiKey = computed(function () {
 });
 
 ?>
-
+<div>
 <x-intranet-app-hwro::hwro-layout heading="Chat" subheading="KI-Chat für HWRO-Vorgänge und Dokumente">
     @if ($this->hasApiKey)
         @livewire('prism-chat', [
@@ -68,3 +68,4 @@ $hasApiKey = computed(function () {
         </flux:card>
     @endif
 </x-intranet-app-hwro::hwro-layout>
+</div>

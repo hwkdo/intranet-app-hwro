@@ -6,12 +6,21 @@ use Hwkdo\IntranetAppHwro\Models\Schlagwort;
 use function Livewire\Volt\computed;
 use function Livewire\Volt\on;
 use function Livewire\Volt\state;
+use function Livewire\Volt\mount;
 use function Livewire\Volt\title;
 use function Livewire\Volt\usesPagination;
 
 usesPagination();
 
 title('Admin - Handwerksrolle Online');
+
+mount(function (): void {
+    $tab = request()->query('tab');
+
+    if ($tab === 'hintergrund') {
+        $this->activeTab = 'hintergrund';
+    }
+});
 
 state([
     'schedulerEvents' => [],
@@ -225,11 +234,12 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
 
         {{-- Flux Tabs --}}
         <flux:tab.group>
-            <flux:tabs wire:model="activeTab">
+            <flux:tabs wire:model.live="activeTab">
                 <flux:tab name="hintergrundbild" icon="photo">Hintergrundbild</flux:tab>
                 <flux:tab name="einstellungen" icon="cog-6-tooth">Einstellungen</flux:tab>
                 <flux:tab name="scheduler" icon="clock">Scheduler</flux:tab>
                 <flux:tab name="schlagwoerter" icon="tag">Schlagwörter</flux:tab>
+                <flux:tab name="hintergrund" icon="clock">Hintergrund</flux:tab>
             </flux:tabs>
 
         <flux:tab.panel name="hintergrundbild">
@@ -430,6 +440,13 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                     </flux:card>                    
                 </div>
             </flux:tab.panel>
+        <flux:tab.panel name="hintergrund">
+            @if ($activeTab === 'hintergrund')
+                <div class="min-h-[400px]">
+                    @livewire('intranet-app-base::background-activities', ['appIdentifier' => 'hwro'], key('hwro-admin-hintergrund'))
+                </div>
+            @endif
+        </flux:tab.panel>
         </flux:tab.group>
 </x-intranet-app-hwro::hwro-layout>
 {{-- Modal für Create/Edit --}}

@@ -5,7 +5,8 @@ use function Livewire\Volt\{title};
 title('Handwerksrolle Online - App-Info');
 
 ?>
-
+<div>
 <x-intranet-app-hwro::hwro-layout heading="App-Info" subheading="Installierte Version und Release-Historie">
     @livewire('intranet-app-base::app-info', ['appIdentifier' => 'hwro'])
 </x-intranet-app-hwro::hwro-layout>
+</div>
