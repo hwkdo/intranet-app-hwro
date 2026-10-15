@@ -1,24 +1,5 @@
 <?php
 
-use Hwkdo\IntranetAppHwro\Models\IntranetAppHwroSettings;
-use Illuminate\Support\Facades\Schedule;
+declare(strict_types=1);
 
-// In Tests überspringe das Laden der Settings
-if (! app()->runningUnitTests()) {
-    $settings = IntranetAppHwroSettings::current()?->settings;
-
-    if ($settings?->scheduleSearchBetriebsnr) {
-        Schedule::command('intranet-app-hwro:search-betriebsnr')
-            ->cron("*/{$settings->scheduleSearchBetriebsnrIntervalMinutes} * * * *");
-    }
-
-    if ($settings?->scheduleMakeBetriebsakte) {
-        Schedule::command('intranet-app-hwro:make-betriebsakte')
-            ->cron("*/{$settings->scheduleMakeBetriebsakteIntervalMinutes} * * * *");
-    }
-
-    if ($settings?->scheduleDeleteVorgaenge) {
-        Schedule::command('intranet-app-hwro:clean-vorgaenge')
-        ->dailyAt('00:01');            
-    }
-}
+// Schedules werden über ProvidesBackgroundActivitiesInterface registriert.

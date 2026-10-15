@@ -51,3 +51,9 @@ Route::middleware(['web','auth','can:manage-app-hwro'])->group(function () {
 
     Route::redirect('apps/hwro/settings/admin', 'apps/hwro/admin');
 });
+
+Route::middleware(['web', 'auth', 'can:manage-app-hwro'])->group(function (): void {
+    Volt::route('apps/hwro/admin/background-activities', 'apps.hwro.admin.background-activities')
+        ->name('apps.hwro.admin.background-activities');
+});
+

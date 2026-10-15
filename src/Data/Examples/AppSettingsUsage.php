@@ -14,8 +14,8 @@ class AppSettingsUsage
         $settings = new AppSettings();
         
         // Einzelne Beschreibung abrufen
-        $description = $settings->getDescriptionFor('scheduleSearchBetriebsnr');
-        echo "Beschreibung für scheduleSearchBetriebsnr: " . $description . "\n";
+        $description = $settings->getDescriptionFor('defaultSchlagwort');
+        echo "Beschreibung für defaultSchlagwort: " . $description . "\n";
         
         // Alle Eigenschaften mit Beschreibungen abrufen
         $allProperties = $settings->getPropertiesWithDescriptions();

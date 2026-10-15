@@ -2,7 +2,7 @@
 
 namespace Hwkdo\IntranetAppHwro\Commands;
 
-use Hwkdo\IntranetAppHwro\Models\IntranetAppHwroSettings;
+use Hwkdo\IntranetAppBase\Services\BackgroundActivityConfigStore;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -29,10 +29,10 @@ class CleanVorgaenge extends Command
     public function handle()
     {
         Log::info('intranet-app-hwro:clean-vorgaenge started');
-        $settings = IntranetAppHwroSettings::current()?->settings;
-        $target = today()->subWeeks($settings->scheduleDeleteVorgaengeAfterWeeks);
-        
-        $vorgaenge = Vorgang::whereNotNull('betriebsakte_created_at')->where('betriebsakte_created_at','<=', $target)->get();
+        $weeks = (int) app(BackgroundActivityConfigStore::class)->parameter('hwro.clean-vorgaenge', 'after_weeks', 12);
+        $target = today()->subWeeks($weeks);
+
+        $vorgaenge = Vorgang::whereNotNull('betriebsakte_created_at')->where('betriebsakte_created_at', '<=', $target)->get();
         $vorgaenge->each(function ($vorgang) {
             $vorgang->delete();
         });

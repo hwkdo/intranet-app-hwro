@@ -28,15 +28,13 @@ test('IntranetAppHwroSettings has version field', function () {
     $settings = IntranetAppHwroSettings::current();
 
     expect($settings->version)->toBeInt()
-        ->and($settings->settings->scheduleSearchBetriebsnr)->toBeBool()
-        ->and($settings->settings->scheduleMakeBetriebsakte)->toBeBool();
+        ->and($settings->settings->defaultSchlagwort)->toBeString();
 })->skip('Database configuration issue');
 
 test('AppSettings has correct default values', function () {
     $settings = new AppSettings();
 
-    expect($settings->scheduleSearchBetriebsnr)->toBeTrue()
-        ->and($settings->scheduleMakeBetriebsakte)->toBeTrue()
+    expect($settings->defaultSchlagwort)->toBe('Antrag auf Eintragung')
         ->and($settings->defaultBelegtypHr)->toBe('Eintragungsverfahren');
 });
 

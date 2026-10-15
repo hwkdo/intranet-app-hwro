@@ -2,6 +2,8 @@
 
 namespace Hwkdo\IntranetAppHwro;
 
+use Hwkdo\IntranetAppBase\Interfaces\ProvidesBackgroundActivitiesInterface;
+use Hwkdo\IntranetAppHwro\Background\HwroBackgroundActivities;
 use Hwkdo\IntranetAppBase\Interfaces\IntranetAppInterface;
 use Hwkdo\IntranetAppBase\Interfaces\ProvidesTasksInterface;
 use Hwkdo\IntranetAppHwro\Data\AppSettings;
@@ -9,7 +11,7 @@ use Hwkdo\IntranetAppHwro\Data\UserSettings;
 use Hwkdo\IntranetAppHwro\Tasks\BetriebsakteAusstehendTaskProvider;
 use Illuminate\Support\Collection;
 
-class IntranetAppHwro implements IntranetAppInterface, ProvidesTasksInterface
+class IntranetAppHwro implements IntranetAppInterface, ProvidesBackgroundActivitiesInterface, ProvidesTasksInterface
 {
     public static function app_name(): string
     {
@@ -62,4 +64,11 @@ class IntranetAppHwro implements IntranetAppInterface, ProvidesTasksInterface
             BetriebsakteAusstehendTaskProvider::class,
         ];
     }
+
+    public static function backgroundActivities(): array
+    {
+        return HwroBackgroundActivities::definitions();
+    }
+
+
 }

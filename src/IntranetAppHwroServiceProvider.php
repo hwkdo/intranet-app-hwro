@@ -2,10 +2,9 @@
 
 namespace Hwkdo\IntranetAppHwro;
 
-use Hwkdo\IntranetAppHwro\Commands\SearchBetriebsnr;
-use Hwkdo\IntranetAppHwro\Commands\MakeBetriebsakte;
 use Hwkdo\IntranetAppHwro\Commands\CleanVorgaenge;
-use Illuminate\Console\Scheduling\Schedule;
+use Hwkdo\IntranetAppHwro\Commands\MakeBetriebsakte;
+use Hwkdo\IntranetAppHwro\Commands\SearchBetriebsnr;
 use Livewire\Volt\Volt;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -32,8 +31,8 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
     public function register(): void
     {
         parent::register();
-        $this->mergeConfigFrom(__DIR__ . '/../config/intranet-app-hwro-disk.php', 'filesystems.disks.intranet-app-hwro');
-        $this->mergeConfigFrom(__DIR__ . '/../config/intranet-app-hwro-medialibrary.php', 'media-library.custom_path_generators');
+        $this->mergeConfigFrom(__DIR__.'/../config/intranet-app-hwro-disk.php', 'filesystems.disks.intranet-app-hwro');
+        $this->mergeConfigFrom(__DIR__.'/../config/intranet-app-hwro-medialibrary.php', 'media-library.custom_path_generators');
     }
 
     public function boot(): void
@@ -45,13 +44,10 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
         });
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
-        $this->app->resolving(Schedule::class, function (): void {
-            require __DIR__.'/../routes/console.php';
-        });
         $this->loadRoutesFrom(__DIR__.'/../routes/ai.php');
-        
+
         // Merge relay servers config after boot to ensure main config is loaded
-        $relayConfig = require __DIR__ . '/../config/relay.php';
+        $relayConfig = require __DIR__.'/../config/relay.php';
         $existingServers = config('relay.servers', []);
         config([
             'relay.servers' => array_merge($existingServers, $relayConfig['servers'] ?? []),
