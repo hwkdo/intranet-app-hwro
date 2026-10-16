@@ -4,7 +4,6 @@ use Flux\Flux;
 use Hwkdo\IntranetAppHwro\Models\Schlagwort;
 
 use function Livewire\Volt\computed;
-use function Livewire\Volt\on;
 use function Livewire\Volt\state;
 use function Livewire\Volt\mount;
 use function Livewire\Volt\title;
@@ -23,7 +22,6 @@ mount(function (): void {
 });
 
 state([
-    'schedulerEvents' => [],
     'activeTab' => 'einstellungen',
     'schlagwoerterSearch' => '',
     'schlagwoerterSortBy' => 'schlagwort',
@@ -36,83 +34,6 @@ state([
     ],
     'filenamesInput' => '',
 ]);
-
-on([
-    'echo:intranet-app-hwro-scheduler,.betriebsnr.search.started' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Suche gestartet',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'info',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-    'echo:intranet-app-hwro-scheduler,.betriebsnr.found' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Betriebsnummer gefunden',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'success',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-    'echo:intranet-app-hwro-scheduler,.betriebsnr.not.found' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Betriebsnummer nicht gefunden',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'warning',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-    'echo:intranet-app-hwro-scheduler,.betriebsnr.search.finished' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Suche abgeschlossen',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'neutral',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-    'echo:intranet-app-hwro-scheduler,.betriebsakte.make.started' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Betriebsakte erstellung gestartet',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'info',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-    'echo:intranet-app-hwro-scheduler,.betriebsakte.make.finished' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Betriebsakte erstellung abgeschlossen',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'success',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-    'echo:intranet-app-hwro-scheduler,.betriebsakte.created' => function ($event) {
-        array_unshift($this->schedulerEvents, [
-            'id' => uniqid().'-'.mt_rand(),
-            'type' => 'Betriebsakte erstellt',
-            'message' => $event['msg'] ?? '',
-            'variant' => 'success',
-            'timestamp' => now()->format('d.m.Y H:i:s'),
-        ]);
-        $this->schedulerEvents = array_slice($this->schedulerEvents, 0, 50);
-    },
-]);
-
-$clearSchedulerEvents = function () {
-    $this->schedulerEvents = [];
-};
 
 $runSearchBetriebsnr = function () {
     \Illuminate\Support\Facades\Artisan::call('intranet-app-hwro:search-betriebsnr');
@@ -263,23 +184,12 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
             <flux:tab.panel name="scheduler">
                 <div style="min-height: 400px;">
                     <flux:card class="glass-card">
-                        <div class="mb-4 flex items-center justify-between">
-                            <flux:heading size="lg">Scheduler Events</flux:heading>
-                            <div class="flex gap-2">
-                                @if(count($schedulerEvents) > 0)
-                                    <flux:button 
-                                        wire:click="clearSchedulerEvents"
-                                        variant="ghost"
-                                        size="sm"
-                                    >
-                                        Liste leeren
-                                    </flux:button>
-                                @endif
-                            </div>
+                        <div class="mb-4">
+                            <flux:heading size="lg">Scheduler</flux:heading>
                         </div>
-                        
+
                         <flux:text class="mb-6">
-                            Live-Übersicht der Scheduler-Events.
+                            Die Läufe protokollieren nur noch ins Log. Fortschritt und letzten Lauf zeigt der Tab Hintergrund.
                         </flux:text>
 
                         <div class="mb-6 flex items-center gap-4">
@@ -305,36 +215,6 @@ $deleteSchlagwort = function (Schlagwort $schlagwort) {
                             </div>
                         </div>
 
-                        <flux:separator variant="subtle" class="mb-4" />
-
-                        <div class="space-y-2" wire:poll.visible>
-                            @if(count($schedulerEvents) === 0)
-                                <div class="rounded-lg border border-dashed border-[#d0e3f9] dark:border-white/20 p-8 text-center">
-                                    <flux:text>
-                                        Keine Events empfangen. Warten auf Scheduler-Aktivität...
-                                    </flux:text>
-                                </div>
-                            @else
-                                @foreach($schedulerEvents as $event)
-                                    <div 
-                                        class="rounded-lg border p-4 @if($event['variant'] === 'info') border-blue-200 bg-blue-50 dark:border-blue-900/50 dark:bg-blue-950/30 @elseif($event['variant'] === 'success') border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-950/30 @elseif($event['variant'] === 'warning') border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30 @else border-[#d0e3f9]/70 bg-white/50 dark:border-white/15 dark:bg-[#04214e]/40 @endif"
-                                        wire:key="event-{{ $event['id'] }}"
-                                    >
-                                        <div class="flex items-start justify-between gap-4">
-                                            <div class="flex-1 min-w-0">
-                                                <div class="flex items-center gap-2 mb-1">
-                                                    <span class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium @if($event['variant'] === 'info') bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 @elseif($event['variant'] === 'success') bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 @elseif($event['variant'] === 'warning') bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 @else bg-[#d0e3f9]/60 text-[#073070] dark:bg-[#04214e]/60 dark:text-white/80 @endif">
-                                                        {{ $event['type'] }}
-                                                    </span>
-                                                    <span class="text-xs text-[#073070]/60 dark:text-white/50">{{ $event['timestamp'] }}</span>
-                                                </div>
-                                                <p class="text-sm text-slate-800 dark:text-white/90 break-words">{{ $event['message'] }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @endif
-                        </div>
                     </flux:card>
                 </div>
             </flux:tab.panel>

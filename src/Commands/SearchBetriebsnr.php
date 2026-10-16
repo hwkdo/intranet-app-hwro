@@ -3,10 +3,6 @@
 namespace Hwkdo\IntranetAppHwro\Commands;
 
 use Hwkdo\BueLaravel\BueLaravel;
-use Hwkdo\IntranetAppHwro\Events\BetriebsNrFound;
-use Hwkdo\IntranetAppHwro\Events\BetriebsNrNotFound;
-use Hwkdo\IntranetAppHwro\Events\SearchBetriebsNrFinished;
-use Hwkdo\IntranetAppHwro\Events\SearchBetriebsNrStarted;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +29,6 @@ class SearchBetriebsnr extends Command
     public function handle(BueLaravel $bueService)
     {
         Log::info('intranet-app-hwro:search-betriebsnr started');
-        SearchBetriebsNrStarted::dispatch('intranet-app-hwro:search-betriebsnr started');
         $vorgaenge = Vorgang::whereNull('betriebsnr')->get();
         $found = [];
         $notFound = [];
@@ -41,17 +36,17 @@ class SearchBetriebsnr extends Command
             $betriebsnr = $bueService->getBetriebsnrByVorgangsnummer($vorgang->vorgangsnummer);
             if ($betriebsnr) {
                 $vorgang->update(['betriebsnr' => $betriebsnr]);
-                BetriebsNrFound::dispatch('Vorgang '.$vorgang->vorgangsnummer.': Betriebsnr '.$betriebsnr.' found');
                 $found[] = $vorgang->vorgangsnummer.' - Betriebsnr '.$betriebsnr;
             } else {
-                BetriebsNrNotFound::dispatch('Vorgang '.$vorgang->vorgangsnummer.': Betriebsnr not found');
                 $notFound[] = $vorgang->vorgangsnummer;
             }
         }
         $this->info('Betriebsnr for vorgaenge searched');
         $this->info('Found: '.implode(',', $found));
         $this->info('Not found: '.implode(',', $notFound));
-        Log::info('intranet-app-hwro:search-betriebsnr finished');
-        SearchBetriebsNrFinished::dispatch('intranet-app-hwro:search-betriebsnr finished');
+        Log::info('intranet-app-hwro:search-betriebsnr finished', [
+            'found' => count($found),
+            'not_found' => count($notFound),
+        ]);
     }
 }

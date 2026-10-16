@@ -2,9 +2,6 @@
 
 namespace Hwkdo\IntranetAppHwro\Commands;
 
-use Hwkdo\IntranetAppHwro\Events\MakeBetriebsakteStarted;
-use Hwkdo\IntranetAppHwro\Events\MakeBetriebsakteFinished;
-use Hwkdo\IntranetAppHwro\Events\BetriebsAkteCreated;
 use Hwkdo\IntranetAppHwro\Models\Vorgang;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -31,9 +28,7 @@ class MakeBetriebsakte extends Command
     public function handle()
     {
         Log::info('intranet-app-hwro:make-betriebsakte started');
-        MakeBetriebsakteStarted::dispatch('intranet-app-hwro:make-betriebsakte started');
 
-        #alle vorgaenge die noch keine betriebsakte haben und eine betriebsnr haben
         $vorgaenge = Vorgang::whereNull('betriebsakte_created_at')->whereNotNull('betriebsnr')->get();
         $canMakeBetriebsakte = $vorgaenge->filter(function ($vorgang) {
             return $vorgang->canMakeBetriebsakte;
@@ -45,7 +40,6 @@ class MakeBetriebsakte extends Command
             $result = $vorgang->makeD3BetriebsakteFromLocal();
             if ($result['success']) {
                 $success++;
-                BetriebsAkteCreated::dispatch('Vorgang '.$vorgang->vorgangsnummer.' - Betriebsakte erstellt: '.$result['message']);
             } else {
                 $errors[] = $result['message'];
             }
@@ -57,11 +51,10 @@ class MakeBetriebsakte extends Command
                 'Betriebsakten-Erstellung abgeschlossen: %d von %d erfolgreich erstellt%s',
                 $success,
                 $total,
-                count($errors) > 0 ? ' (' . count($errors) . ' Fehler)' : ''
+                count($errors) > 0 ? ' ('.count($errors).' Fehler)' : ''
             );
         }
 
         Log::info($message);
-        MakeBetriebsakteFinished::dispatch($message);
     }
 }
