@@ -4,6 +4,7 @@ namespace Hwkdo\IntranetAppHwro;
 
 use Hwkdo\IntranetAppHwro\Commands\CleanVorgaenge;
 use Hwkdo\IntranetAppHwro\Commands\MakeBetriebsakte;
+use Hwkdo\IntranetAppHwro\Commands\ReconcileStorage;
 use Hwkdo\IntranetAppHwro\Commands\SearchBetriebsnr;
 use Livewire\Volt\Volt;
 use Spatie\LaravelPackageTools\Package;
@@ -25,7 +26,8 @@ class IntranetAppHwroServiceProvider extends PackageServiceProvider
             ->discoversMigrations()
             ->hasCommand(SearchBetriebsnr::class)
             ->hasCommand(MakeBetriebsakte::class)
-            ->hasCommand(CleanVorgaenge::class);
+            ->hasCommand(CleanVorgaenge::class)
+            ->hasCommand(ReconcileStorage::class);
     }
 
     public function register(): void
