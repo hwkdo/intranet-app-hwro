@@ -49,6 +49,12 @@ $hasApiKey = computed(function () {
             'apiKey' => $this->apiKey,
             'baseUrl' => $this->baseUrl,
             'useMcpTools' => true, // Temporär deaktiviert zum Testen
+            'suggestions' => [
+                'Zeig mir die neuesten HWRO-Vorgänge.',
+                'Für welche Vorgänge wurde noch keine Betriebsakte erstellt?',
+                'Welche Dokumente gehören zu einem bestimmten Vorgang?',
+                'Suche alle Vorgänge zu einer Betriebsnummer.',
+            ],
         ])
     @else
         <flux:card class="glass-card">
